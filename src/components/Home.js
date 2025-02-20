@@ -15,13 +15,13 @@ export default function Home() {
     slidesToScroll: 1,
     arrows: false,
     autoplay: true,
-    autoplaySpeed: 1000,
+    autoplaySpeed: 2000,
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="flex flex-col md:flex-row items-center justify-around px-6 py-16 md:py-32 bg-blue-400 text-white mt-12">
+      <div className="flex flex-col md:flex-row items-center justify-around px-6 py-16 md:py-32 bg-gradient-to-t from-blue-400 to-blue-600 text-white mt-12">
         <div className="max-w-3xl">
           <h1 className="text-3xl md:text-4xl font-bold">Staff Leave Management System</h1>
           <p className="mt-4 text-lg">
@@ -31,7 +31,7 @@ export default function Home() {
             className="mt-6 px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg shadow hover:bg-gray-100"
             onClick={() => navigate("/login")}
           >
-            Apply for Leave
+            Get Started
           </button>
         </div>
 
@@ -42,14 +42,14 @@ export default function Home() {
               <img
                 src="https://static.wixstatic.com/media/bfee2e_a361f3557fc440c98d1d2edf8c1f0d1f~mv2.jpg/v1/fill/w_1891,h_783,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/bfee2e_a361f3557fc440c98d1d2edf8c1f0d1f~mv2.jpg"
                 alt="College Campus"
-                className="rounded-lg shadow-lg  w-full"
+                className="rounded-lg w-full"
               />
             </div>
             <div>
               <img
                 src="https://www.vidyavision.com/CollegeUploads/Photos/2019-30-3-15-05-13_Screenshot%20(160).png"
                 alt="College Campus"
-                className="rounded-lg shadow-lg  w-full h-64"
+                className="rounded-lg w-full h-64"
               />
             </div>
             {/* Add more slides as needed */}
@@ -61,10 +61,10 @@ export default function Home() {
       <div className="flex py-16 px-6 bg-white flex-row justify-around">
         <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-32 items-center">
           {/* Image Section */}
-          <div className="relative">
+          <div className="relative" data-aos="flip-left">
             <img
               src="https://th.bing.com/th/id/OIP.uc2B-J44DXlC6K8TXYJFVwHaHa?rs=1&pid=ImgDetMain"
-              alt="Pydah College Campus"
+              alt="Pydah"
               className="w-full h-auto object-cover rounded-lg"
             />
           </div>
@@ -86,28 +86,27 @@ export default function Home() {
       </div>
 
       {/* Features Section */}
-      <div className="py-16 px-6 bg-blue-500">
-        <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-gray-800">Why Choose Our System?</h2>
-          <p className="mt-2 text-black">A seamless leave management experience for colleges.</p>
-        </div>
+<div className="py-16 px-6 bg-gradient-to-b from-blue-400 to-blue-600">
+  <div className="max-w-5xl mx-auto text-center">
+    <h2 className="text-3xl font-bold text-gray-800">Why Choose Our System?</h2>
+    <p className="mt-2 text-black">A seamless leave management experience for organizations.</p>
+  </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-10 max-w-5xl mx-auto">
-          <div className="p-6 bg-gray-100 rounded-lg shadow">
-            <h3 className="text-xl font-semibold text-blue-600">Student Leave Requests</h3>
-            <p className="text-gray-600 mt-2">Students can apply for leave with ease.</p>
-          </div>
-          <div className="p-6 bg-gray-100 rounded-lg shadow">
-            <h3 className="text-xl font-semibold text-blue-600">Faculty Approvals</h3>
-            <p className="text-gray-600 mt-2">Professors can approve or decline leave requests instantly.</p>
-          </div>
-          <div className="p-6 bg-gray-100 rounded-lg shadow">
-            <h3 className="text-xl font-semibold text-blue-600">Admin Dashboard</h3>
-            <p className="text-gray-600 mt-2">College admins can track leave records efficiently.</p>
-          </div>
-        </div>
-      </div>
-
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-10 max-w-5xl mx-auto">
+    <div className="p-6 bg-gray-100 rounded-lg shadow">
+      <h3 className="text-xl font-semibold text-blue-600">Employee Leave Requests</h3>
+      <p className="text-gray-600 mt-2">Employees can apply for leave with ease.</p>
+    </div>
+    <div className="p-6 bg-gray-100 rounded-lg shadow">
+      <h3 className="text-xl font-semibold text-blue-600">Manager Approvals</h3>
+      <p className="text-gray-600 mt-2">Managers can approve or decline leave requests instantly.</p>
+    </div>
+    <div className="p-6 bg-gray-100 rounded-lg shadow">
+      <h3 className="text-xl font-semibold text-blue-600">Admin Dashboard</h3>
+      <p className="text-gray-600 mt-2">Admins can track leave records efficiently.</p>
+    </div>
+  </div>
+</div>
       {/* Contact Section */}
       <div className="py-16 px-6 bg-gray-50 text-center">
         <h2 className="text-3xl font-bold text-gray-800">Need Assistance?</h2>

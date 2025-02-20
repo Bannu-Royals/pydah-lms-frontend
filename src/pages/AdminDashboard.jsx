@@ -1,171 +1,208 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FaFilter } from "react-icons/fa";
+import { FaComments, FaFilter } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx";
 
-const AdminDashboard = () => {
-  const [leaveRequests, setLeaveRequests] = useState([]);
-  const [filteredRequests, setFilteredRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showPopup, setShowPopup] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState(null);
-  const [remarks, setRemarks] = useState("");
-  const [showFilter, setShowFilter] = useState(false);
-  const [filterStatus, setFilterStatus] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [excelFile, setExcelFile] = useState(null); // State to store the Excel file
-  const navigate = useNavigate();
 
-  // Logout function
-  const handleLogout = () => {
-    // Remove token or user data from localStorage
-    localStorage.removeItem("token"); // Or sessionStorage depending on where the token is stored
-    // Navigate to login page after logout
-    navigate("/login"); // Adjust this to your login route
-  };
 
-  useEffect(() => {
-    // Get today's date for default filtering
-    const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD format
+  const AdminDashboard = () => {
+    const [leaveRequests, setLeaveRequests] = useState([]);
+    const [hodLeaveRequests, setHodLeaveRequests] = useState([]);
+    const [filteredRequests, setFilteredRequests] = useState([]);
+    const [filteredHodRequests, setFilteredHodRequests] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [showPopup, setShowPopup] = useState(false);
+    const [selectedRequest, setSelectedRequest] = useState(null);
+    const [remarks, setRemarks] = useState("");
+    const [showFilter, setShowFilter] = useState(false);
+    const [filterStatus, setFilterStatus] = useState("");
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
+    const [showHodRequests, setShowHodRequests] = useState(false);
+    const [excelFile, setExcelFile] = useState(null);
+    // const [allFilteredLeaves, setAllFilteredLeaves] = useState([]);
+    const navigate = useNavigate();
+  
+    useEffect(() => {
+      const today = new Date().toISOString().split("T")[0];
+  
+      axios.get("http://localhost:5000/api/admin/leave-requests")
+        .then((response) => {
+          setLeaveRequests(response.data.leaveRequests);
+          setFilteredRequests(response.data.leaveRequests.filter(request => 
+            request.leaveRequest && new Date(request.leaveRequest.startDate).toISOString().split("T")[0] >= today
+          ));
+        })
+        .catch((error) => console.error("Error fetching leave requests", error));
+  
+      axios.get("http://localhost:5000/api/admin/hod-leave-requests")
+        .then((response) => {
+          setHodLeaveRequests(response.data.leaveRequests);
+          setFilteredHodRequests(response.data.leaveRequests.filter(request => 
+            request.startDate && new Date(request.startDate).toISOString().split("T")[0] >= today
+          ));
+          
+          setLoading(false);
+        })
+        .catch((error) => console.error("Error fetching HOD leave requests", error));
+    }, []);
+  
+    const handleOpenPopup = (employeeId, leaveRequestId, status, isHodRequest = false) => {
+      setSelectedRequest({ employeeId, leaveRequestId, status, isHodRequest });
+      setRemarks("");
+      setShowPopup(true);
+    };
+  
+    const handleConfirmUpdate = () => {
+      if (!selectedRequest) return;
+      const { employeeId, leaveRequestId, status, isHodRequest } = selectedRequest;
+      const finalRemarks = remarks.trim() || (status === "Approved" ? "Approved by admin" : "Rejected by admin");
+  
+      const url = isHodRequest
+        ? "http://localhost:5000/api/admin/hod-update-leave-request"
+        : "http://localhost:5000/api/admin/update-leave-request";
+      console.log(employeeId, leaveRequestId, status, remarks );
+      axios.put(url, { employeeId, leaveRequestId, status, remarks: finalRemarks })
+        .then(() => {
+          alert("Leave request updated successfully!");
+          if (isHodRequest) {
+            setHodLeaveRequests((prev) => prev.map((req) =>
+              req.employeeId === employeeId && req._id === leaveRequestId
+                ? { ...req, status, remarks: finalRemarks }
+                : req
+            ));
+          } else {
+            setLeaveRequests((prev) => prev.map((req) =>
+              req.employeeId === employeeId && req.leaveRequest._id === leaveRequestId
+                ? { ...req, leaveRequest: { ...req.leaveRequest, status, remarks: finalRemarks } }
+                : req
+            ));
+          }
+          setShowPopup(false);
+        })
+        .catch(() => alert("Error updating leave request!"));
+    };
+  
+    
 
-    axios
-      .get("http://localhost:5000/api/admin/leave-requests")
-      .then((response) => {
-        const requests = response.data.leaveRequests;
-
-        // Filter requests where both startDate is greater than or equal to today's date
-        // and endDate is greater than or equal to today's date
-        const filteredRequests = requests.filter((request) => {
-          const requestStartDate = new Date(request.leaveRequest.startDate)
-            .toISOString()
-            .split("T")[0];
-          const requestEndDate = new Date(request.leaveRequest.endDate)
-            .toISOString()
-            .split("T")[0];
-          return requestStartDate >= today && requestEndDate >= today;
+    const applyFilters = () => {
+      let filtered = leaveRequests;
+      let hodfiltered = hodLeaveRequests;
+    
+      if (filterStatus) {
+        filtered = filtered.filter(
+          (req) => req.leaveRequest.status === filterStatus
+        );
+        hodfiltered = hodfiltered.filter(
+          (req) => req.status === filterStatus
+        );
+      }
+    
+      if (startDate && endDate) {
+        filtered = filtered.filter((req) => {
+          const leaveStartDate = new Date(req.leaveRequest.startDate);
+          return (
+            leaveStartDate >= new Date(startDate) &&
+            leaveStartDate <= new Date(endDate)
+          );
         });
-
-        setLeaveRequests(requests);
-        setFilteredRequests(filteredRequests);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching leave requests", error);
-        setLoading(false);
-      });
-  }, []);
-
-  const handleOpenPopup = (employeeId, leaveRequestId, status) => {
-    setSelectedRequest({ employeeId, leaveRequestId, status });
-    setRemarks("");
-    setShowPopup(true);
-  };
-
-  const handleConfirmUpdate = () => {
-    if (!selectedRequest) return;
-    const { employeeId, leaveRequestId, status } = selectedRequest;
-
-    const finalRemarks =
-      remarks.trim() ||
-      (status === "Approved" ? "Approved by admin" : "Rejected by admin");
-
-    axios
-      .put("http://localhost:5000/api/admin/update-leave-request", {
-        employeeId,
-        leaveRequestId,
-        status,
-        remarks: finalRemarks,
-      })
-      .then(() => {
-        alert("Leave request updated successfully!");
-        setLeaveRequests((prevRequests) =>
-          prevRequests.map((req) =>
-            req.employeeId === employeeId &&
-            req.leaveRequest._id === leaveRequestId
-              ? {
-                  ...req,
-                  leaveRequest: {
-                    ...req.leaveRequest,
-                    status,
-                    remarks: finalRemarks,
-                  },
-                }
-              : req
-          )
-        );
-        applyFilters(); // Reapply filters after update
-        setShowPopup(false);
-      })
-      .catch((error) => {
-        console.error("Error updating leave request:", error);
-        alert("Error updating leave request!");
-      });
-  };
-
-  const applyFilters = () => {
-    let filtered = leaveRequests;
-
-    if (filterStatus) {
-      filtered = filtered.filter(
-        (req) => req.leaveRequest.status === filterStatus
+        hodfiltered = hodfiltered.filter((req) => {
+          const leaveStartDate = new Date(req.startDate);
+          return leaveStartDate >= new Date(startDate) && leaveStartDate <= new Date(endDate);
+        });
+      }
+    
+      setFilteredRequests(filtered);
+      setFilteredHodRequests(hodfiltered);
+      setShowFilter(false);
+    };
+    
+    const exportToExcel = () => {
+      let allFilteredLeaves = [
+        ...filteredRequests, 
+        ...filteredHodRequests
+      ];
+    
+      // Filter to only include approved requests
+      let approvedRequests = allFilteredLeaves.filter(
+        (req) => req.leaveRequest ? req.leaveRequest.status === "Approved" : req.status === "Approved"
       );
-    }
-
-    if (startDate && endDate) {
-      filtered = filtered.filter((req) => {
-        const leaveStartDate = new Date(req.leaveRequest.startDate);
-        return (
-          leaveStartDate >= new Date(startDate) &&
-          leaveStartDate <= new Date(endDate)
-        );
+    
+      // Sorting by Department and Name
+      approvedRequests.sort((a, b) => {
+        if (a.department < b.department) return -1;
+        if (a.department > b.department) return 1;
+    
+        // Add checks to ensure 'name' is not undefined
+        if (a.name && b.name) {
+          return a.name.localeCompare(b.name);
+        }
+    
+        // If name is undefined, place it at the end
+        return a.name ? -1 : 1;
       });
-    }
+    
+      // Prepare the data for Excel export
+      const excelData = approvedRequests.map((req, index) => {
+        // Convert to date objects and strip off the time part (set time to midnight)
+        const startDate = new Date(req.leaveRequest ? req.leaveRequest.startDate : req.startDate);
+        const endDate = new Date(req.leaveRequest ? req.leaveRequest.endDate : req.endDate);
+        
+        // Remove the time part by setting both dates to midnight
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(0, 0, 0, 0);
+        
+        // Calculate the difference in time between the two dates
+        const diffTime = endDate - startDate;
+        const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24)); // Convert to days
+    
+        return {
+          "Serial No": index + 1,
+          "Name of the Faculty": req.name || req.hodName,
+          Department: req.department,
+          "Employee ID": req.employeeId || req.hodId,
+          "On Leave Period": `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`,
+          "No. of Days": diffDays + 1,
+          Reason: req.leaveRequest ? req.leaveRequest.reason : req.reason,
+          Remarks: req.leaveRequest ? req.leaveRequest.remarks || "No remarks" : req.remarks || "No remarks",
+        };
+      });
+    
+      // Create Excel file
+      const ws = XLSX.utils.json_to_sheet(excelData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Approved Leave Requests");
+    
+      // Generate Excel file and create a downloadable URL
+      const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+      const fileBlob = new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const fileURL = URL.createObjectURL(fileBlob);
+    
+      if (excelFile) {
+        URL.revokeObjectURL(excelFile); // Revoke the old file URL to release memory
+      }
+    
+      setExcelFile(fileURL); // Store file URL in state
+    };
+    
 
-    setFilteredRequests(filtered);
-    setShowFilter(false);
-  };
-
-  const exportToExcel = () => {
-    let approvedRequests = filteredRequests.filter(
-      (req) => req.leaveRequest.status === "Approved"
+  // Loader display while data is being fetched
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen text-xl font-semibold">
+        Loading...
+      </div>
     );
+  }
 
-    approvedRequests.sort((a, b) => {
-      if (a.department < b.department) return -1;
-      if (a.department > b.department) return 1;
-      return a.name.localeCompare(b.name);
-    });
-
-    const excelData = approvedRequests.map((req, index) => ({
-      "Serial No": index + 1,
-      "Name of the Faculty": req.name,
-      Department: req.department,
-      "Employee ID": req.employeeId,
-      "On Leave Period": `${new Date(
-        req.leaveRequest.startDate
-      ).toLocaleDateString()} - ${new Date(
-        req.leaveRequest.endDate
-      ).toLocaleDateString()}`,
-      "No. of Days": req.leaveRequest.days,
-      Reason: req.leaveRequest.reason,
-      Remarks: req.leaveRequest.remarks || "No remarks",
-    }));
-
-    const ws = XLSX.utils.json_to_sheet(excelData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Approved Leave Requests");
-
-    // Generate Excel file and create a downloadable URL
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-    const fileBlob = new Blob([excelBuffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
-    const fileURL = URL.createObjectURL(fileBlob);
-
-    setExcelFile(fileURL); // Store file URL in state
-  };
+  
+    const handleLogout = () => {
+      localStorage.removeItem("token");
+      navigate("/login");
+    };
 
   // Loader display while data is being fetched
   if (loading) {
@@ -236,6 +273,92 @@ const AdminDashboard = () => {
           </div>
         </div>
 
+          {/* HOD Leave Requests Section */}
+          <div className="mb-6">
+          <button
+            className="bg-gray-700 text-white px-4 py-2 rounded mb-4"
+            onClick={() => setShowHodRequests(!showHodRequests)}
+          >
+            {showHodRequests ? "Hide" : "Show"} HOD Leave Requests
+          </button>
+
+          {showHodRequests && (
+  <section>
+    <h2 className="text-xl font-semibold text-gray-800 mb-4">
+      HOD Leave Requests
+    </h2>
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {filteredHodRequests.map((request) => (
+        <div
+          key={request._id}
+          className="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300"
+        >
+          {/* Leave Request Content */}
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">
+            {request.hodName}
+          </h2>
+          <p className="text-gray-600 text-sm mb-2">
+            <span className="font-medium">HOD-ID:</span> {request.hodId}
+          </p>
+          <p className="text-gray-600 text-sm mb-2">
+            <span className="font-medium">Department:</span> {request.department}
+          </p>
+          <p className="text-gray-600 text-sm mb-2">
+            <span className="font-medium">Leave:</span>{" "}
+            {new Date(request.startDate).toLocaleDateString()} -{" "}
+            {new Date(request.endDate).toLocaleDateString()}
+          </p>
+          <p
+            className={`font-semibold text-sm mb-2 ${
+              request.status === "Approved"
+                ? "text-green-600"
+                : "text-red-600"
+            }`}
+          >
+            {request.status}
+          </p>
+          <p className="text-gray-600 text-sm mb-4">
+            <span className="font-medium">Remarks:</span>{" "}
+            {request.remarks || "No remarks"}
+          </p>
+          {request.status === "Pending" && (
+            <div className="flex gap-3 mt-4">
+              <button
+                className="bg-green-500 text-white px-5 py-2 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-300 w-full sm:w-auto"
+                onClick={() =>
+                  handleOpenPopup(
+                    request.hodId,
+                    request._id,
+                    "Approved",
+                    true
+                  )
+                }
+              >
+                Approve
+              </button>
+              <button
+                className="bg-red-500 text-white px-5 py-2 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-300 w-full sm:w-auto"
+                onClick={() =>
+                  handleOpenPopup(
+                    request.hodId,
+                    request._id,
+                    "Rejected",
+                    true
+                  )
+                }
+              >
+                Reject
+              </button>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  </section>
+)}
+
+        </div>
+
         {/* Forwarded by HOD Section */}
         {forwardedByHod.length > 0 && (
           <section>
@@ -292,7 +415,8 @@ const AdminDashboard = () => {
                         handleOpenPopup(
                           request.employeeId,
                           request.leaveRequest._id,
-                          "Approved"
+                          "Approved",
+                        
                         )
                       }
                     >
@@ -304,7 +428,8 @@ const AdminDashboard = () => {
                         handleOpenPopup(
                           request.employeeId,
                           request.leaveRequest._id,
-                          "Rejected"
+                          "Rejected",
+                   
                         )
                       }
                     >
@@ -513,7 +638,7 @@ const AdminDashboard = () => {
               </button>
             </div>
           </div>
-        </div>
+        </div> 
       )}
     </div>
   );
