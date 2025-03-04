@@ -1,187 +1,223 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import axios from "axios";
 
-const HodLeaveForm = ({ onClose, hodId }) => {
+const HodLeaveForm = ({ onClose, hodId, leaveBalance }) => {
+  const [leaveType, setLeaveType] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [reason, setReason] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [periods, setPeriods] = useState([]);
   const [message, setMessage] = useState("");
+  const [isCheckingLeaves, setIsCheckingLeaves] = useState(false);
 
-  const [alternateSchedule, setAlternateSchedule] = useState(
-    Array(7).fill({ lecturerName: "", classAssigned: "" })
-  );
+  const leaveTypes = [
+    "Casual Leave",
+    "Cost Casual Leave",
+    "Medical Leave",
+    "Earned Leave",
+    "Special Leave"
+  ];
 
-  const handlePeriodChange = (index, field, value) => {
-    setAlternateSchedule((prev) => {
-      const updatedSchedule = [...prev];
-      updatedSchedule[index] = { ...updatedSchedule[index], [field]: value };
-      return updatedSchedule;
-    });
+  // Add a new period to the alternate schedule
+  const addPeriod = () => {
+    setPeriods([
+      ...periods,
+      { periodNumber: "", lecturerName: "", classAssigned: "" }
+    ]);
   };
 
+  // Remove a period from the alternate schedule
+  const removePeriod = (index) => {
+    setPeriods(periods.filter((_, i) => i !== index));
+  };
+
+  // Handle changes for period fields (number, lecturer, class)
+  const handlePeriodChange = (index, field, value) => {
+    const updatedPeriods = [...periods];
+    updatedPeriods[index][field] = value;
+    setPeriods(updatedPeriods);
+  };
+
+  // Ensure all 7 periods are accounted for (filling missing with default)
+  const processAlternateSchedule = () => {
+    const periodMap = new Map();
+    periods.forEach(({ periodNumber, lecturerName, classAssigned }) => {
+      if (periodNumber) {
+        periodMap.set(Number(periodNumber), { lecturerName, classAssigned });
+      }
+    });
+
+    for (let i = 1; i <= 7; i++) {
+      if (!periodMap.has(i)) {
+        periodMap.set(i, { lecturerName: "Leisure", classAssigned: "Not Assigned" });
+      }
+    }
+
+    return Array.from(periodMap, ([periodNumber, details]) => ({
+      periodNumber,
+      lecturerName: details.lecturerName,
+      classAssigned: details.classAssigned
+    }));
+  };
+
+  // Submit leave request
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setMessage("");
-
+  
+    const alternateSchedule = processAlternateSchedule();
     const hodtoken = localStorage.getItem("hodtoken");
+  
     if (!hodtoken) {
-      setMessage("You must be logged in to submit a leave request.");
+      setMessage("HOD is not logged in. Please log in and try again.");
       return;
     }
-
-    if (
-      !startDate ||
-      !endDate ||
-      !reason ||
-      alternateSchedule.some((schedule) => schedule.lecturerName === "")
-    ) {
-      setMessage("Please fill out all required fields.");
-      setLoading(false);
-      return;
-    }
-
-    // Convert alternateSchedule array to an object
-    const alternateScheduleObject = {};
-    alternateSchedule.forEach((item, index) => {
-      alternateScheduleObject[`period${index + 1}`] = item;
-    });
-
+  
     try {
-      const response = await fetch("http://localhost:5000/api/hod/apply-leave", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${hodtoken}`,
-        },
-        body: JSON.stringify({
-          hodId,
-          startDate,
-          endDate,
-          reason,
-          alternateSchedule: alternateScheduleObject, // Sending as an object
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage("Leave request submitted successfully!");
-        setStartDate("");
-        setEndDate("");
-        setReason("");
-        setAlternateSchedule(Array(7).fill({ lecturerName: "", classAssigned: "" }));
-
-        setTimeout(() => {
-          onClose();
-        }, 2000);
-      } else {
-        setMessage(data.msg || "Failed to submit leave request");
-      }
+      // Submit the leave request
+      await axios.post(
+        "http://localhost:5000/api/hod/apply-leave",
+        { hodId, leaveType, startDate, endDate, reason, alternateSchedule },
+        { headers: { "Content-Type": "application/json", Authorization: `Bearer ${hodtoken}` } }
+      );
+  
+      setMessage("Leave request submitted successfully!");
+      setStartDate("");
+      setEndDate("");
+      setReason("");
+      setPeriods([]);
+  
+      setTimeout(() => {
+        onClose();
+      }, 2000);
     } catch (error) {
-      setMessage("An error occurred. Please try again.");
-    } finally {
-      setLoading(false);
+      setMessage(error.response?.data?.msg || "Failed to submit leave request");
     }
   };
+  
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50 p-4">
-      <div className="w-full max-w-3xl bg-white p-8 rounded-lg shadow-md">
-        <h2 className="text-2xl font-semibold text-center mb-6">Apply for HOD Leave</h2>
+    <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-lg p-6 mt-20">
+      <h2 className="text-2xl font-semibold text-gray-700 text-center">Apply for Leave</h2>
+      {message && <p className="text-center text-red-500 mt-2">{message}</p>}
 
-        {message && (
-          <p
-            className={`text-sm text-center mb-4 ${
-              message.includes("successfully") ? "text-green-600" : "text-red-600"
-            }`}
+      <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+      <div
+  className={`text-sm font-semibold ${
+    leaveBalance <= 0
+      ? "text-red-500"
+      : leaveBalance < 4
+      ? "text-yellow-500"
+      : "text-green-500"
+  }`}
+>
+  Available Leaves: <strong>{leaveBalance}</strong>
+</div>
+
+
+        {/* Leave Type */}
+        <div>
+          <label className="block text-gray-600 font-medium">Leave Type:</label>
+          <select
+            className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
+            value={leaveType}
+            onChange={(e) => setLeaveType(e.target.value)}
+            required
           >
-            {message}
-          </p>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Reason, Start Date, and End Date */}
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Reason for Leave</label>
-              <textarea
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                required
-              ></textarea>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium mb-1">Start Date</label>
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">End Date</label>
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                  required
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Periods Layout */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {Array.from({ length: 7 }).map((_, index) => (
-              <div key={index}>
-                <label className="block text-sm font-medium mb-1">Period {index + 1}</label>
-                <input
-                  type="text"
-                  placeholder="Lecturer's Name"
-                  value={alternateSchedule[index].lecturerName}
-                  onChange={(e) => handlePeriodChange(index, "lecturerName", e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                />
-                <input
-                  type="text"
-                  placeholder="Class Assigned"
-                  value={alternateSchedule[index].classAssigned}
-                  onChange={(e) => handlePeriodChange(index, "classAssigned", e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                />
-              </div>
+            <option value="">Select Leave Type</option>
+            {leaveTypes.map((type, index) => (
+              <option key={index} value={type}>{type}</option>
             ))}
-          </div>
+          </select>
+        </div>
 
-          {/* Submit and Cancel Buttons */}
-          <div className="flex justify-between items-center mt-6">
-            <button
-              type="button"
-              onClick={onClose}
-              className="bg-gray-500 text-white px-6 py-3 rounded-md hover:bg-gray-600 transition"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className={`bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600 transition ${
-                loading ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-              disabled={loading}
-            >
-              {loading ? "Submitting..." : "Submit"}
-            </button>
+        {/* Dates */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-gray-600 font-medium">Start Date:</label>
+            <input
+              type="date"
+              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              required
+            />
           </div>
-        </form>
-      </div>
+          <div>
+            <label className="block text-gray-600 font-medium">End Date:</label>
+            <input
+              type="date"
+              className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              required
+            />
+          </div>
+        </div>
+
+        {/* Reason */}
+        <div>
+          <label className="block text-gray-600 font-medium">Reason:</label>
+          <textarea
+            className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            required
+          />
+        </div>
+
+        {/* Periods Section */}
+        <div className="bg-gray-100 p-4 rounded-lg">
+          <h3 className="text-lg font-semibold text-gray-700">Alternate Schedule</h3>
+          {periods.map((period, index) => (
+            <div key={index} className="mt-3 bg-white p-3 rounded-lg shadow">
+              <label className="block text-gray-600 font-medium">Period Number:</label>
+              <input
+                type="number"
+                min="1"
+                max="7"
+                className="w-full p-2 border rounded-lg"
+                value={period.periodNumber}
+                onChange={(e) => handlePeriodChange(index, "periodNumber", e.target.value)}
+                required
+              />
+
+              <label className="block text-gray-600 font-medium mt-2">Lecturer Name:</label>
+              <input
+                type="text"
+                className="w-full p-2 border rounded-lg"
+                value={period.lecturerName}
+                onChange={(e) => handlePeriodChange(index, "lecturerName", e.target.value)}
+                required
+              />
+
+              <label className="block text-gray-600 font-medium mt-2">Class Assigned:</label>
+              <input
+                type="text"
+                className="w-full p-2 border rounded-lg"
+                value={period.classAssigned}
+                onChange={(e) => handlePeriodChange(index, "classAssigned", e.target.value)}
+                required
+              />
+
+              <button onClick={() => removePeriod(index)} className="mt-2 text-red-500">
+                Remove
+              </button>
+            </div>
+          ))}
+          <button type="button" onClick={addPeriod} className="mt-4 bg-green-500 text-white py-2 px-4 rounded-lg">
+            Add Period
+          </button>
+        </div>
+
+        {/* Submit */}
+        <button
+          type="submit"
+          className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg"
+          disabled={isCheckingLeaves}
+        >
+          {isCheckingLeaves ? "Checking..." : "Submit Leave Request"}
+        </button>
+      </form>
     </div>
   );
 };

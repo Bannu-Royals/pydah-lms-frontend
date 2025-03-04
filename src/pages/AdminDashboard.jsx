@@ -30,6 +30,7 @@ import * as XLSX from "xlsx";
       axios.get("http://localhost:5000/api/admin/leave-requests")
         .then((response) => {
           setLeaveRequests(response.data.leaveRequests);
+          console.log(response.data.leaveRequests);
           setFilteredRequests(response.data.leaveRequests.filter(request => 
             request.leaveRequest && new Date(request.leaveRequest.startDate).toISOString().split("T")[0] >= today
           ));
@@ -39,6 +40,7 @@ import * as XLSX from "xlsx";
       axios.get("http://localhost:5000/api/admin/hod-leave-requests")
         .then((response) => {
           setHodLeaveRequests(response.data.leaveRequests);
+          console.log(response.data.leaveRequests);
           setFilteredHodRequests(response.data.leaveRequests.filter(request => 
             request.startDate && new Date(request.startDate).toISOString().split("T")[0] >= today
           ));
@@ -58,26 +60,37 @@ import * as XLSX from "xlsx";
       if (!selectedRequest) return;
       const { employeeId, leaveRequestId, status, isHodRequest } = selectedRequest;
       const finalRemarks = remarks.trim() || (status === "Approved" ? "Approved by admin" : "Rejected by admin");
-  
+    
       const url = isHodRequest
         ? "http://localhost:5000/api/admin/hod-update-leave-request"
         : "http://localhost:5000/api/admin/update-leave-request";
-      console.log(employeeId, leaveRequestId, status, remarks );
-      axios.put(url, { employeeId, leaveRequestId, status, remarks: finalRemarks })
+    
+      axios
+        .put(url, { employeeId, leaveRequestId, status, remarks: finalRemarks })
         .then(() => {
           alert("Leave request updated successfully!");
           if (isHodRequest) {
-            setHodLeaveRequests((prev) => prev.map((req) =>
-              req.employeeId === employeeId && req._id === leaveRequestId
-                ? { ...req, status, remarks: finalRemarks }
-                : req
-            ));
+            setHodLeaveRequests((prev) =>
+              prev.map((req) =>
+                req.hodId === employeeId && req.leaveRequest._id === leaveRequestId
+                  ? {
+                      ...req,
+                      leaveRequest: { ...req.leaveRequest, status, remarks: finalRemarks },
+                    }
+                  : req
+              )
+            );
           } else {
-            setLeaveRequests((prev) => prev.map((req) =>
-              req.employeeId === employeeId && req.leaveRequest._id === leaveRequestId
-                ? { ...req, leaveRequest: { ...req.leaveRequest, status, remarks: finalRemarks } }
-                : req
-            ));
+            setLeaveRequests((prev) =>
+              prev.map((req) =>
+                req.employeeId === employeeId && req.leaveRequest._id === leaveRequestId
+                  ? {
+                      ...req,
+                      leaveRequest: { ...req.leaveRequest, status, remarks: finalRemarks },
+                    }
+                  : req
+              )
+            );
           }
           setShowPopup(false);
         })
@@ -92,24 +105,29 @@ import * as XLSX from "xlsx";
     
       if (filterStatus) {
         filtered = filtered.filter(
-          (req) => req.leaveRequest.status === filterStatus
+          (req) => req.leaveRequest && req.leaveRequest.status === filterStatus
         );
         hodfiltered = hodfiltered.filter(
-          (req) => req.status === filterStatus
+          (req) => req.leaveRequest && req.leaveRequest.status === filterStatus
         );
       }
     
       if (startDate && endDate) {
         filtered = filtered.filter((req) => {
-          const leaveStartDate = new Date(req.leaveRequest.startDate);
+          const leaveStartDate = req.leaveRequest && new Date(req.leaveRequest.startDate);
           return (
+            leaveStartDate &&
             leaveStartDate >= new Date(startDate) &&
             leaveStartDate <= new Date(endDate)
           );
         });
         hodfiltered = hodfiltered.filter((req) => {
-          const leaveStartDate = new Date(req.startDate);
-          return leaveStartDate >= new Date(startDate) && leaveStartDate <= new Date(endDate);
+          const leaveStartDate = req.leaveRequest && new Date(req.leaveRequest.startDate);
+          return (
+            leaveStartDate &&
+            leaveStartDate >= new Date(startDate) &&
+            leaveStartDate <= new Date(endDate)
+          );
         });
       }
     
@@ -119,14 +137,11 @@ import * as XLSX from "xlsx";
     };
     
     const exportToExcel = () => {
-      let allFilteredLeaves = [
-        ...filteredRequests, 
-        ...filteredHodRequests
-      ];
+      let allFilteredLeaves = [...filteredRequests, ...filteredHodRequests];
     
       // Filter to only include approved requests
       let approvedRequests = allFilteredLeaves.filter(
-        (req) => req.leaveRequest ? req.leaveRequest.status === "Approved" : req.status === "Approved"
+        (req) => req.leaveRequest && req.leaveRequest.status === "Approved"
       );
     
       // Sorting by Department and Name
@@ -134,38 +149,28 @@ import * as XLSX from "xlsx";
         if (a.department < b.department) return -1;
         if (a.department > b.department) return 1;
     
-        // Add checks to ensure 'name' is not undefined
-        if (a.name && b.name) {
-          return a.name.localeCompare(b.name);
-        }
-    
-        // If name is undefined, place it at the end
-        return a.name ? -1 : 1;
+        // Add checks to ensure 'hodName' or 'name' is not undefined
+        const nameA = a.hodName || a.name;
+        const nameB = b.hodName || b.name;
+        return nameA.localeCompare(nameB);
       });
     
       // Prepare the data for Excel export
       const excelData = approvedRequests.map((req, index) => {
-        // Convert to date objects and strip off the time part (set time to midnight)
-        const startDate = new Date(req.leaveRequest ? req.leaveRequest.startDate : req.startDate);
-        const endDate = new Date(req.leaveRequest ? req.leaveRequest.endDate : req.endDate);
-        
-        // Remove the time part by setting both dates to midnight
-        startDate.setHours(0, 0, 0, 0);
-        endDate.setHours(0, 0, 0, 0);
-        
-        // Calculate the difference in time between the two dates
+        const startDate = new Date(req.leaveRequest.startDate);
+        const endDate = new Date(req.leaveRequest.endDate);
         const diffTime = endDate - startDate;
         const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24)); // Convert to days
     
         return {
           "Serial No": index + 1,
-          "Name of the Faculty": req.name || req.hodName,
+          "Name of the Faculty": req.hodName || req.name,
           Department: req.department,
-          "Employee ID": req.employeeId || req.hodId,
+          "Employee ID": req.hodId || req.employeeId,
           "On Leave Period": `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`,
           "No. of Days": diffDays + 1,
-          Reason: req.leaveRequest ? req.leaveRequest.reason : req.reason,
-          Remarks: req.leaveRequest ? req.leaveRequest.remarks || "No remarks" : req.remarks || "No remarks",
+          Reason: req.leaveRequest.reason,
+          Remarks: req.leaveRequest.remarks || "No remarks",
         };
       });
     
@@ -187,7 +192,6 @@ import * as XLSX from "xlsx";
     
       setExcelFile(fileURL); // Store file URL in state
     };
-    
 
   // Loader display while data is being fetched
   if (loading) {
