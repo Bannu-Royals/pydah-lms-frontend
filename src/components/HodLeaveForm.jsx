@@ -74,24 +74,30 @@ const HodLeaveForm = ({ onClose, hodId, leaveBalance }) => {
   
     try {
       // Submit the leave request
-      await axios.post(
+      const response = await axios.post(
         "http://localhost:5000/api/hod/apply-leave",
         { hodId, leaveType, startDate, endDate, reason, alternateSchedule },
         { headers: { "Content-Type": "application/json", Authorization: `Bearer ${hodtoken}` } }
       );
-  
+    
       setMessage("Leave request submitted successfully!");
       setStartDate("");
       setEndDate("");
       setReason("");
       setPeriods([]);
-  
+    
+      // Check if a warning is present in the response and display it
+      if (response.data.warning) {
+        alert(response.data.warning);
+      }
+    
       setTimeout(() => {
         onClose();
       }, 2000);
     } catch (error) {
       setMessage(error.response?.data?.msg || "Failed to submit leave request");
     }
+    setIsCheckingLeaves(false);
   };
   
 

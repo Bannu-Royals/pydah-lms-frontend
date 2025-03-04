@@ -1,12 +1,22 @@
 import React, { useState } from "react";
+import axios from "axios";
 
-const LeaveForm = ({ onClose, employeeId }) => {
+const LeaveForm = ({ onClose, employeeId, leaveBalance }) => {
+  const [leaveType, setLeaveType] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [reason, setReason] = useState("");
   const [periods, setPeriods] = useState([]);
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [isCheckingLeaves, setIsCheckingLeaves] = useState(false);
+
+  const leaveTypes = [
+    "Casual Leave",
+    "Cost Casual Leave",
+    "Medical Leave",
+    "Paid Leave",
+    "Special Leave"
+  ];
 
   const addPeriod = () => {
     setPeriods([...periods, { periodNumber: "", lecturerName: "", classAssigned: "" }]);
@@ -23,59 +33,103 @@ const LeaveForm = ({ onClose, employeeId }) => {
   };
 
   const processAlternateSchedule = () => {
-    const formattedPeriods = periods.map(({ periodNumber, lecturerName, classAssigned }) => ({
-      periodNumber: Number(periodNumber),
-      lecturerName,
-      classAssigned,
+    const periodMap = new Map();
+    periods.forEach(({ periodNumber, lecturerName, classAssigned }) => {
+      if (periodNumber) {
+        periodMap.set(Number(periodNumber), { lecturerName, classAssigned });
+      }
+    });
+
+    for (let i = 1; i <= 7; i++) {
+      if (!periodMap.has(i)) {
+        periodMap.set(i, { lecturerName: "Leisure", classAssigned: "Not Assigned" });
+      }
+    }
+
+    return Array.from(periodMap, ([periodNumber, details]) => ({
+      periodNumber,
+      lecturerName: details.lecturerName,
+      classAssigned: details.classAssigned
     }));
-    return formattedPeriods;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setIsCheckingLeaves(true);
     setMessage("");
 
-    const token = localStorage.getItem("token");
+    const employeeToken = localStorage.getItem("token");
+
+    if (!employeeToken) {
+      setMessage("Employee is not logged in. Please log in and try again.");
+      setIsCheckingLeaves(false);
+      return;
+    }
+
     const alternateSchedule = processAlternateSchedule();
 
     try {
-      const response = await fetch(`http://localhost:5000/api/employees/${employeeId}/leave-request`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ startDate, endDate, reason, alternateSchedule }),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        setMessage("Leave request submitted successfully!");
-        setStartDate("");
-        setEndDate("");
-        setReason("");
-        setPeriods([]);
-
-        setTimeout(() => {
-          onClose();
-        }, 2000);
-      } else {
-        setMessage(data.message || "Failed to submit leave request");
+      const response = await axios.post(
+        `http://localhost:5000/api/employee/${employeeId}/leave-request`,
+        { leaveType, startDate, endDate, reason, alternateSchedule },
+        { headers: { "Content-Type": "application/json", Authorization: `Bearer ${employeeToken}` } }
+      );
+    
+      setMessage("Leave request submitted successfully!");
+      setStartDate("");
+      setEndDate("");
+      setReason("");
+      setPeriods([]);
+    
+      // Check if the response contains a warning and show an alert
+      if (response.data.warning) {
+        alert(response.data.warning);
       }
+    
+      setTimeout(() => {
+        onClose();
+      }, 2000);
     } catch (error) {
-      setMessage("Error submitting request. Please try again later.");
+      setMessage(error.response?.data?.msg || "Failed to submit leave request");
     }
-
-    setLoading(false);
-  };
+    
+    setIsCheckingLeaves(false);
+  };    
 
   return (
-    <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-lg p-6 mt-10">
+    <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-lg p-6 mt-20">
       <h2 className="text-2xl font-semibold text-gray-700 text-center">Apply for Leave</h2>
       {message && <p className="text-center text-red-500 mt-2">{message}</p>}
-      
+
       <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+        <div
+          className={`text-sm font-semibold ${
+            leaveBalance <= 0
+              ? "text-red-500"
+              : leaveBalance < 4
+              ? "text-yellow-500"
+              : "text-green-500"
+          }`}
+        >
+          Available Leaves: <strong>{leaveBalance}</strong>
+        </div>
+
+        {/* Leave Type */}
+        <div>
+          <label className="block text-gray-600 font-medium">Leave Type:</label>
+          <select
+            className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
+            value={leaveType}
+            onChange={(e) => setLeaveType(e.target.value)}
+            required
+          >
+            <option value="">Select Leave Type</option>
+            {leaveTypes.map((type, index) => (
+              <option key={index} value={type}>{type}</option>
+            ))}
+          </select>
+        </div>
+
         {/* Dates */}
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -121,44 +175,36 @@ const LeaveForm = ({ onClose, employeeId }) => {
                 type="number"
                 min="1"
                 max="7"
-                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
+                className="w-full p-2 border rounded-lg"
                 value={period.periodNumber}
                 onChange={(e) => handlePeriodChange(index, "periodNumber", e.target.value)}
                 required
               />
 
-              <label className="block text-gray-600 font-medium mt-2">Assigned Teacher:</label>
+              <label className="block text-gray-600 font-medium mt-2">Lecturer Name:</label>
               <input
                 type="text"
-                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
+                className="w-full p-2 border rounded-lg"
                 value={period.lecturerName}
                 onChange={(e) => handlePeriodChange(index, "lecturerName", e.target.value)}
                 required
               />
 
-              <label className="block text-gray-600 font-medium mt-2">Assigned Class:</label>
+              <label className="block text-gray-600 font-medium mt-2">Class Assigned:</label>
               <input
                 type="text"
-                className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
+                className="w-full p-2 border rounded-lg"
                 value={period.classAssigned}
                 onChange={(e) => handlePeriodChange(index, "classAssigned", e.target.value)}
                 required
               />
 
-              <button
-                type="button"
-                onClick={() => removePeriod(index)}
-                className="mt-3 text-sm text-red-500 hover:underline"
-              >
-                Remove Period
+              <button onClick={() => removePeriod(index)} className="mt-2 text-red-500">
+                Remove
               </button>
             </div>
           ))}
-          <button
-            type="button"
-            onClick={addPeriod}
-            className="mt-4 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition duration-200"
-          >
+          <button type="button" onClick={addPeriod} className="mt-4 bg-green-500 text-white py-2 px-4 rounded-lg">
             Add Period
           </button>
         </div>
@@ -166,10 +212,10 @@ const LeaveForm = ({ onClose, employeeId }) => {
         {/* Submit */}
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-200"
-          disabled={loading}
+          className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg"
+          disabled={isCheckingLeaves}
         >
-          {loading ? "Submitting..." : "Submit Leave Request"}
+          {isCheckingLeaves ? "Checking..." : "Submit Leave Request"}
         </button>
       </form>
     </div>

@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LeaveForm from "../components/LeaveForm";
 
+
 const EmployeeDashboard = () => {
   const [employee, setEmployee] = useState(null);
+   const [loading, setLoading] = useState(true);
   const [showLeaveForm, setShowLeaveForm] = useState(false);
   const navigate = useNavigate();
 
@@ -41,7 +43,11 @@ const EmployeeDashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("employeeId");
-    navigate("/login");
+  
+    // Show a confirmation message before navigating
+    if (window.confirm("Are you sure you want to log out?")) {
+      navigate("/login");
+    }
   };
 
   // Helper function to format date
@@ -93,7 +99,7 @@ const EmployeeDashboard = () => {
       {/* Leave Form (displayed as part of the page, not a popup) */}
       {showLeaveForm && (
         <div className="bg-white p-6 rounded shadow-md mb-6">
-          <LeaveForm onClose={() => setShowLeaveForm(false)} employeeId={employee?.employeeId} />
+          <LeaveForm onClose={() => setShowLeaveForm(false)} employeeId={employee.employeeId}  leaveBalance={employee.leaveBalance} />
         </div>
       )}
 

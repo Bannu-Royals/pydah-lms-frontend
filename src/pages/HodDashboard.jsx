@@ -1,15 +1,20 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import HodLeaveForm from "../components/HodLeaveForm";
+import { useNavigate } from "react-router-dom";
 
 const HODDashboard = () => {
+   const [loading, setLoading] = useState(true);
   const [hod, setHod] = useState(null);
   const [leaveRequests, setLeaveRequests] = useState([]);
   const [selectedLeave, setSelectedLeave] = useState(null);
   const [remarks, setRemarks] = useState("");
   const [hodLeaveRequests, setHodLeaveRequests] = useState([]);
   const [showLeaveForm, setShowLeaveForm] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(false); // State to trigger re-fetch
+  const navigate = useNavigate();
   useEffect(() => {
+    setLoading(true);
     const fetchHodData = async () => {
       try {
         const hodtoken = localStorage.getItem("hodtoken");
@@ -50,6 +55,7 @@ const HODDashboard = () => {
         });
 
         setLeaveRequests(sortedRequests);
+        setLoading(false);
       } catch (err) {
         console.error("Error fetching leave requests:", err);
       }
@@ -57,10 +63,11 @@ const HODDashboard = () => {
 
     fetchHodData();
     fetchLeaveRequests();
-  }, []);
+  }, [refreshTrigger]);
 
   const handleAction = async (status) => {
     try {
+      setLoading(true);
       if (!selectedLeave) return;
   
       const hodtoken = localStorage.getItem("hodtoken");
@@ -74,7 +81,7 @@ const HODDashboard = () => {
       await axios.put(
         apiEndpoint,
         {
-          hodId: hod._id,
+          hodId:isHodLeave? hod._id : selectedLeave.employeeId ,
           leaveId: selectedLeave._id,
           status,
           remarks,
@@ -98,15 +105,21 @@ const HODDashboard = () => {
   
       setSelectedLeave(null);
       setRemarks("");
+      setRefreshTrigger(prev => !prev);
     } catch (err) {
       console.error("Error updating leave:", err);
+      setLoading(false);
     }
   };
   
 
   const handleLogout = () => {
     localStorage.removeItem("hodtoken");
-    window.location.href = "/login";
+  
+    // Show a confirmation message before navigating
+    if (window.confirm("Are you sure you want to log out?")) {
+      navigate("/login");
+    }
   };
 
   const groupedLeaveRequests = {
@@ -126,6 +139,20 @@ const HODDashboard = () => {
     };
     return statusOrder[a.status] - statusOrder[b.status];
   });
+
+    // ✅ Improved Loader UI for Better User Experience
+    if (loading) {
+      return (
+        <div className="flex justify-center items-center h-screen">
+          <div className="flex flex-col items-center">
+            {/* Animated Loader */}
+            <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-2xl animate-spin"></div>
+            
+            <p className="mt-4 text-lg font-semibold text-gray-700">Processing Your Request, please wait...</p>
+          </div>
+        </div>
+      );
+    }
 
   return (
     <div className="max-w-7xl mx-auto p-8">
@@ -370,7 +397,7 @@ const HODDashboard = () => {
         </div>
       )}
       {selectedLeave && (
-        <div className="fixed inset-0 flex items-center justify-center  bg-black bg-opacity-50">
+        <div className="sticky inset-0 flex items-center justify-center  bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl mx-4 transition-all transform duration-300 ease-in-out scale-95 hover:scale-100 max-h-[90vh] sm:max-h-[50vh] overflow-auto">
             <h2 className="text-lg font-semibold mb-4 text-gray-900 text-center">
               Update Leave Request
