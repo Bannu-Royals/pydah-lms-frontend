@@ -63,7 +63,7 @@ const AdminDashboard = () => {
       .catch((error) => console.error("Error fetching leave requests", error));
 
     axios
-      .get("http://localhost:5000/api/admin/hod-leave-requests")
+      .get("https://pydah-lms-backend.onrender.com/api/admin/hod-leave-requests")
       .then((response) => {
         const formattedHodRequests = response.data.leaveRequests.map(
           (request) => ({
@@ -123,8 +123,8 @@ const AdminDashboard = () => {
 
     // API URL based on whether it's an HOD request or Faculty request
     const url = isHodRequest
-      ? "http://localhost:5000/api/admin/hod-update-leave-request"
-      : "http://localhost:5000/api/admin/update-leave-request";
+      ? "https://pydah-lms-backend.onrender.com/api/admin/hod-update-leave-request"
+      : "https://pydah-lms-backend.onrender.com/api/admin/update-leave-request";
 
     console.log(employeeId, leaveRequestId, status);
 
