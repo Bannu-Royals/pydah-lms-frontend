@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "@shadcn/ui": "^0.0.4",
+    "animate.css": "^4.1.1",
+    "aos": "^2.3.4",
     "axios": "^1.7.9",
     "cra-template": "1.2.0",
     "font-awesome": "^4.7.0",
@@ -15,6 +17,7 @@
     "react-icons": "^5.4.0",
     "react-router-dom": "^7.1.5",
     "react-scripts": "5.0.1",
+    "react-typed": "^2.0.12",
     "ui": "^0.2.4",
     "xlsx": "^0.18.5",
     "xlsx-js-style": "^1.2.0"

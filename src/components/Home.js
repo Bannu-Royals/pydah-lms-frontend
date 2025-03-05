@@ -1,8 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { ReactTyped} from "react-typed";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import 'animate.css';
+import PIC from './images/PYDAH LOGO.png';
+import Durga_Prasad from './images/PIC_DP.jpg';
+import Ravi from './images/ravi_IMAGE.jpg';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -15,28 +20,49 @@ export default function Home() {
     slidesToScroll: 1,
     arrows: false,
     autoplay: true,
-    autoplaySpeed: 2000,
+    autoplaySpeed: 3000,
   };
 
+  <script>
+  AOS.init();
+</script>
+
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-secondary text-textDark ">
       {/* Hero Section */}
-      <div className="flex flex-col md:flex-row items-center justify-around px-6 py-16 md:py-32 bg-gradient-to-t from-blue-400 to-blue-600 text-white mt-12">
-        <div className="max-w-3xl">
-          <h1 className="text-3xl md:text-4xl font-bold">Staff Leave Management System</h1>
-          <p className="mt-4 text-lg">
-            Streamline leave tracking for faculty, and staff effortlessly.
-          </p>
-          <button
-            className="mt-6 px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg shadow hover:bg-gray-100"
-            onClick={() => navigate("/login")}
-          >
-            Get Started
-          </button>
-        </div>
+      <div className="sticky flex flex-col md:flex-row items-center justify-around px-6 py-16 md:py-32 bg-secondary shadow-outRaised text-textDark border-b-8 border-primary rounded-neumorphic ">
+      <div className="max-w-3xl">
+      {/* Typing Effect Heading */}
+      <h1 className="text-4xl md:text-5xl font-heading">
+        <ReactTyped
+          strings={[
+            "Staff Leave Management System",
+            "Seamless Leave Tracking",
+            "Manage Leaves Effortlessly",
+          ]}
+          typeSpeed={50}
+          backSpeed={30}
+          loop
+        />
+      </h1>
+
+      <p className="mt-4 text-lg text-black">
+        Streamline leave tracking for faculty and staff effortlessly.
+      </p>
+
+      <button
+      
+        className="mt-6 px-6 py-3 bg-accent text-textDark font-semibold rounded-neumorphic shadow-md
+                   hover:shadow-none border-2 border-primary active:shadow-innerSoft transition-all duration-300
+                   "
+        onClick={() => navigate("/login")}
+      >
+        Get Started
+      </button>
+    </div>
 
         {/* Slider Section */}
-        <div className="mt-8 md:mt-0 max-w-2xl w-full">
+        <div className="mt-8 md:mt-0 max-w-2xl w-full rounded-neumorphic shadow-innerSoft overflow-hidden">
           <Slider {...sliderSettings}>
             <div>
               <img
@@ -52,70 +78,118 @@ export default function Home() {
                 className="rounded-lg w-full h-64"
               />
             </div>
-            {/* Add more slides as needed */}
           </Slider>
         </div>
       </div>
 
-      {/* Pydah College Content Section */}
-      <div className="flex py-16 px-6 bg-white flex-row justify-around">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-32 items-center">
+      {/* About College Section */}
+      <div className="flex py-16 px-6 bg-white rounded-neumorphic shadow-innerSoft flex-row justify-around" >
+        <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-16 items-center">
           {/* Image Section */}
-          <div className="relative" data-aos="flip-left">
+          <div className="relative rounded-neumorphic shadow-innerSoft overflow-hidden">
             <img
-              src="https://th.bing.com/th/id/OIP.uc2B-J44DXlC6K8TXYJFVwHaHa?rs=1&pid=ImgDetMain"
-              alt="Pydah"
-              className="w-full h-auto object-cover rounded-lg"
+              src={PIC}
+              alt="Pydah College"
+              className="w-full h-auto object-cover"
             />
           </div>
 
           {/* Text Section */}
           <div className="text-center md:text-left">
-            <h2 className="text-3xl font-bold text-gray-800">About Pydah College of Engineering</h2>
-            <p className="mt-4 text-lg text-gray-600">
-              Pydah College of Engineering is a prestigious institution located in the fast-developing smart city of Kakinada, Andhra Pradesh. Established in 2009, it offers a range of undergraduate and postgraduate engineering courses.
+            <h2 className="text-3xl font-heading text-primary">About Pydah College of Engineering</h2>
+            <p className="mt-4 text-lg text-black">
+              Pydah College of Engineering is a prestigious institution in Kakinada, Andhra Pradesh. Established in 2009, it offers top-tier education.
             </p>
-            <p className="mt-4 text-gray-600">
-              The campus spans over 40 acres and is equipped with state-of-the-art infrastructure. The institution prioritizes ethical values and provides world-class education through its dedicated faculty, many of whom come from premier institutes such as IITs.
-            </p>
-            <p className="mt-4 text-gray-600">
-              With an excellent campus placement record, students are well-prepared for industry roles, with top companies such as HCL, Tech Mahindra, and Aurobindo visiting the campus for recruitment drives.
+            <p className="mt-4 text-black">
+              The campus spans over 40 acres with world-class infrastructure and faculty from premier institutes like IITs.
             </p>
           </div>
         </div>
       </div>
 
       {/* Features Section */}
-<div className="py-16 px-6 bg-gradient-to-b from-blue-400 to-blue-600">
-  <div className="max-w-5xl mx-auto text-center">
-    <h2 className="text-3xl font-bold text-gray-800">Why Choose Our System?</h2>
-    <p className="mt-2 text-black">A seamless leave management experience for organizations.</p>
-  </div>
+      <div className="py-16 px-6 bg-secondary rounded-neumorphic shadow-innerSoft">
+        <div  className="max-w-5xl mx-auto text-center">
+          <h2 className="text-3xl font-heading text-primary">Why Choose Our System?</h2>
+          <p className="mt-2 text-textDark">A seamless leave management experience.</p>
+        </div>
 
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-10 max-w-5xl mx-auto">
-    <div className="p-6 bg-gray-100 rounded-lg shadow">
-      <h3 className="text-xl font-semibold text-blue-600">Employee Leave Requests</h3>
-      <p className="text-gray-600 mt-2">Employees can apply for leave with ease.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-10 max-w-5xl mx-auto">
+          <div className="p-6 bg-lightBeige rounded-neumorphic shadow-outerRaised">
+            <h3 className="text-xl font-semibold text-accent">Employee Leave Requests</h3>
+            <p className="text-textDark mt-2">Employees can apply for leave with ease.</p>
+          </div>
+          <div className="p-6 bg-lightBeige rounded-neumorphic shadow-outerRaised">
+            <h3 className="text-xl font-semibold text-accent">Manager Approvals</h3>
+            <p className="text-textDark mt-2">Managers can approve leave requests instantly.</p>
+          </div>
+          <div className="p-6 bg-lightBeige rounded-neumorphic shadow-outerRaised">
+            <h3 className="text-xl font-semibold text-accent">Admin Dashboard</h3>
+            <p className="text-textDark mt-2">Admins can track leave records efficiently.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Contact Section */}
+      <div className="py-16 px-6 bg-primary text-center rounded-neumorphic ">
+        <h2 className="text-3xl font-heading text-white mb-2">Need Assistance?</h2>
+        
+       {/* Developers Section */}
+<div className="py-16 px-6 bg-secondary text-center rounded-neumorphic shadow-innerSoft">
+  <h2 className="text-3xl font-heading text-primary">Meet the Developers</h2>
+  <p className="mt-2 text-textDark">The minds behind the system</p>
+
+  <div className="flex flex-col sm:flex-row justify-center gap-8 mt-10">
+    {/* Developer - Ravi */}
+    <div className="p-6 bg-white rounded-neumorphic shadow-outerRaised text-center max-w-xs">
+      <img
+        src={Ravi}
+        alt="Ravi"
+        className="w-32 h-32 mx-auto rounded-full shadow-md"
+      />
+      <h3 className="text-xl font-semibold text-primary mt-4">Ravi</h3>
+      <p className="text-textDark">Full Stack Developer</p>
+      <p className="mt-2 text-sm text-gray-600">
+        With expertise in <strong>MERN Stack & REST APIs</strong>, Ravi ensures <strong>seamless integration</strong> between frontend and backend, optimizing database performance and API security.
+      </p>
+      <a
+        href="https://www.linkedin.com/in/ravi-buraga-54b0bb280/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-4 inline-block px-4 py-2 bg-primary text-textLight rounded-neumorphic shadow-md 
+                   hover:shadow-none active:shadow-innerSoft transition-all duration-300"
+      >
+        LinkedIn Profile
+      </a>
     </div>
-    <div className="p-6 bg-gray-100 rounded-lg shadow">
-      <h3 className="text-xl font-semibold text-blue-600">Manager Approvals</h3>
-      <p className="text-gray-600 mt-2">Managers can approve or decline leave requests instantly.</p>
-    </div>
-    <div className="p-6 bg-gray-100 rounded-lg shadow">
-      <h3 className="text-xl font-semibold text-blue-600">Admin Dashboard</h3>
-      <p className="text-gray-600 mt-2">Admins can track leave records efficiently.</p>
+
+    {/* Developer - Durga Prasad */}
+    <div className="p-6 bg-white rounded-neumorphic shadow-outerRaised text-center max-w-xs">
+      <img
+        src={Durga_Prasad}
+        alt="Durga Prasad"
+        className="w-32 h-32 mx-auto rounded-full shadow-md"
+      />
+      <h3 className="text-xl font-semibold text-primary mt-4">Durga Prasad</h3>
+      <p className="text-textDark">Full Stack Developer</p>
+      <p className="mt-2 text-sm text-gray-600">
+        Skilled in <strong>React, Node.js, and MongoDB</strong>,specializes in building <strong>responsive web applications</strong>. He is passionate about clean UI/UX and backend optimization.
+      </p>
+      <a
+        href="https://www.linkedin.com/in/durga-prasad-kakileti-bannu/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-4 inline-block px-4 py-2 bg-primary text-textLight rounded-neumorphic shadow-md 
+                   hover:shadow-none active:shadow-innerSoft transition-all duration-300"
+      >
+        LinkedIn Profile
+      </a>
     </div>
   </div>
 </div>
-      {/* Contact Section */}
-      <div className="py-16 px-6 bg-gray-50 text-center">
-        <h2 className="text-3xl font-bold text-gray-800">Need Assistance?</h2>
-        <p className="mt-2 text-gray-600">Reach out to our college admin for help.</p>
-        <button
-          className="mt-6 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700"
-        >
-          Contact Admin
-        </button>
+
+
+
       </div>
     </div>
   );

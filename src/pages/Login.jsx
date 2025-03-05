@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import 'animate.css';
 
 const Login = () => {
   const [customDepartment, setCustomDepartment] = useState("");
@@ -122,9 +123,16 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 px-4">
-      <form className="bg-white p-10 rounded-xl shadow-lg w-full max-w-lg border border-gray-300">
-        <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-maroon to-darkGold px-4 sm:px-6 lg:px-8">
+     
+      <form className="w-full max-w-md bg-secondary shadow-outerRaised rounded-neumorphic p-6 sm:p-8">
+      <button
+        onClick={() => navigate("/")}
+        className="mb-4 text-textLight bg-primary hover:bg-darkGold border border-transparent rounded-neumorphic py-2 px-4 text-sm font-semibold transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-accent"
+      >
+        <i className="fa fa-arrow-left"></i> {/* Left arrow icon */}
+      </button>
+        <h2 className="text-3xl font-bold mb-6 text-center text-primary font-heading animate__animated animate__bounce">
           {isRegistering ? "Register" : "Login"}
         </h2>
 
@@ -137,7 +145,7 @@ const Login = () => {
         {/* Role Selector (Only in Login) */}
         {!isRegistering && (
           <div className="mb-4">
-            <label className="block text-gray-700 font-medium mb-2">
+            <label className="block text-primary font-medium mb-2">
               Select Role
             </label>
             <select
@@ -243,7 +251,7 @@ const Login = () => {
         )}
 
         <div className="input-group">
-          <input
+          <input 
             type="email"
             name="email"
             placeholder="Email"
@@ -258,6 +266,7 @@ const Login = () => {
 
         <div className="input-group">
           <input
+          class=" font-medium"
             type="password"
             name="password"
             placeholder="Password"
@@ -307,7 +316,7 @@ const Login = () => {
           type="submit"
           className={`w-full text-white p-3 rounded-lg font-semibold transition-all duration-300 ${
             isFormValid
-              ? "bg-blue-600 hover:bg-blue-700"
+              ? "bg-primary"
               : "bg-gray-400 cursor-not-allowed"
           }`}
           disabled={!isFormValid}
@@ -322,7 +331,7 @@ const Login = () => {
             : "Don't have an account?"}{" "}
           <button
             onClick={() => setIsRegistering(!isRegistering)}
-            className="text-blue-600 hover:text-blue-800 underline"
+            className="text-primary hover:text-blue-800 underline"
           >
             {isRegistering ? "Login here" : "Register here"}
           </button>
@@ -330,7 +339,7 @@ const Login = () => {
 
         <button
           onClick={() => navigate("/hod-login")}
-          className="w-full mt-4 text-blue-600 hover:text-blue-800 underline"
+          className="w-full mt-4 text-primary hover:text-green-800 underline"
         >
           HOD Login
         </button>
@@ -346,12 +355,12 @@ const Login = () => {
           padding: 12px;
           border: 1px solid #ccc;
           border-radius: 8px;
-          font-size: 16px;
+          font-size: font-medium;
           transition: border 0.3s ease, box-shadow 0.3s ease;
         }
         .input-group input:focus {
-          outline: none;
-          border-color: #2563eb;
+           outline: none;
+           border-color: #2563eb;
           box-shadow: 0 0 6px rgba(37, 99, 235, 0.4);
         }
       `}</style>

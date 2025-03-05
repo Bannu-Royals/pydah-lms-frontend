@@ -14,6 +14,7 @@ import Home from "./components/Home"
 const App = () => {
   return (
     <>
+    <div className="bg-secondary">
     <Header />
     <Router>
       <Routes>
@@ -28,6 +29,7 @@ const App = () => {
       </Routes>
     </Router>
     <Footer />
+    </div>
     </>
   );
 };
