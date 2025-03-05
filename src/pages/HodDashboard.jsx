@@ -38,7 +38,7 @@ const HODDashboard = () => {
     const fetchLeaveRequests = async () => {
       try {
         const hodtoken = localStorage.getItem("hodtoken");
-        const res = await axios.get("http://localhost:5000/api/hod/leaves", {
+        const res = await axios.get("https://pydah-lms-backend.onrender.com/api/hod/leaves", {
           headers: { Authorization: `Bearer ${hodtoken}` },
         });
 
@@ -76,8 +76,8 @@ const HODDashboard = () => {
       // Determine the correct API endpoint based on whether it's a faculty or HOD leave request
       const isHodLeave = hodLeaveRequests.some((leave) => leave._id === selectedLeave._id);
       const apiEndpoint = isHodLeave
-        ? "http://localhost:5000/api/hod/update-hod-leave"
-        : "http://localhost:5000/api/hod/update-leave";
+        ? "https://pydah-lms-backend.onrender.com/api/hod/update-hod-leave"
+        : "https://pydah-lms-backend.onrender.com/api/hod/update-leave";
   
       await axios.put(
         apiEndpoint,
@@ -147,7 +147,7 @@ const HODDashboard = () => {
         <div className="flex justify-center items-center h-screen">
           <div className="flex flex-col items-center">
             {/* Animated Loader */}
-            <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-2xl animate-spin"></div>
+            <div className="w-16 h-16 border-4 border-blue-500  rounded-2xl animate-spin"></div>
             
             <p className="mt-4 text-lg font-semibold text-gray-700">Processing Your Request, please wait...</p>
           </div>
