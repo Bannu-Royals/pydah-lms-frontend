@@ -75,7 +75,7 @@ const HodLeaveForm = ({ onClose, hodId, leaveBalance }) => {
     try {
       // Submit the leave request
       const response = await axios.post(
-        "http://localhost:5000/api/hod/apply-leave",
+        "https://pydah-lms-backend.onrender.com/api/hod/apply-leave",
         { hodId, leaveType, startDate, endDate, reason, alternateSchedule },
         { headers: { "Content-Type": "application/json", Authorization: `Bearer ${hodtoken}` } }
       );

@@ -70,7 +70,7 @@ const LeaveForm = ({ onClose, employeeId, leaveBalance }) => {
 
     try {
       const response = await axios.post(
-        `http://localhost:5000/api/employee/${employeeId}/leave-request`,
+        `https://pydah-lms-backend.onrender.com/api/employee/${employeeId}/leave-request`,
         { leaveType, startDate, endDate, reason, alternateSchedule },
         { headers: { "Content-Type": "application/json", Authorization: `Bearer ${employeeToken}` } }
       );

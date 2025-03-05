@@ -18,7 +18,7 @@ const HODDashboard = () => {
     const fetchHodData = async () => {
       try {
         const hodtoken = localStorage.getItem("hodtoken");
-        const res = await axios.get("http://localhost:5000/api/hod/me", {
+        const res = await axios.get("https://pydah-lms-backend.onrender.com/api/hod/me", {
           headers: { Authorization: `Bearer ${hodtoken}` },
 
         });

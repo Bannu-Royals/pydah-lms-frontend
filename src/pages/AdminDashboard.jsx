@@ -31,7 +31,7 @@ const AdminDashboard = () => {
     const today = new Date().toISOString().split("T")[0];
 
     axios
-      .get("http://localhost:5000/api/admin/leave-requests")
+      .get("https://pydah-lms-backend.onrender.com/api/admin/leave-requests")
       .then((response) => {
         const formattedRequests = response.data.leaveRequests.map(
           (request) => ({

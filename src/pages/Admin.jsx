@@ -25,10 +25,10 @@ const AdminDashboard = () => {
     useEffect(() => {
         const fetchLeaveRequests = async () => {
           try {
-            const facultyResponse = await fetch("http://localhost:5000/api/admin/leave-requests");
+            const facultyResponse = await fetch("https://pydah-lms-backend.onrender.com/api/admin/leave-requests");
             const facultyData = await facultyResponse.json();
             
-            const hodResponse = await fetch("http://localhost:5000/api/admin/hod-leave-requests");
+            const hodResponse = await fetch("https://pydah-lms-backend.onrender.com/api/admin/hod-leave-requests");
             const hodData = await hodResponse.json();
       
             // 🔍 Debugging: Log API responses

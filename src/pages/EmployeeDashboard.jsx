@@ -16,7 +16,7 @@ const EmployeeDashboard = () => {
       if (!token || !employeeId) return navigate("/login");
 
       try {
-        const response = await fetch(`http://localhost:5000/api/employee/${employeeId}`, {
+        const response = await fetch(`https://pydah-lms-backend.onrender.com/api/employee/${employeeId}`, {
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         });
 

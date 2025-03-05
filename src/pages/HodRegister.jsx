@@ -61,7 +61,7 @@ const HodRegister = () => {
     e.preventDefault();
     const finalDepartment = department === "Others" ? customDepartment : department;
     try {
-      const response = await fetch("http://localhost:5000/api/hod/hod-register", {
+      const response = await fetch("https://pydah-lms-backend.onrender.com/api/hod/hod-register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password, department: finalDepartment }),
