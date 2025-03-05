@@ -447,7 +447,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background p-6 flex flex-col lg:flex-row justify-center items-center w-full">
-      <div className="max-w-6xl mx-auto p-6 bg-background rounded-lg shadow-inner w-full">
+      <div className=" mx-auto p-6 bg-background rounded-lg shadow-inner w-full">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
           <h1 className="text-2xl sm:text-3xl font-bold text-primary text-center sm:text-left">
