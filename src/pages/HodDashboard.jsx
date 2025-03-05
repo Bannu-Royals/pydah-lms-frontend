@@ -20,6 +20,7 @@ const HODDashboard = () => {
         const hodtoken = localStorage.getItem("hodtoken");
         const res = await axios.get("http://localhost:5000/api/hod/me", {
           headers: { Authorization: `Bearer ${hodtoken}` },
+
         });
         setHod(res.data);
         console.log(res.data);
@@ -158,39 +159,52 @@ const HODDashboard = () => {
     <div className="max-w-7xl mx-auto p-8">
       {/* HOD Info Section */}
       {hod && (
-        <div className="bg-gradient-to-r from-blue-500 to-blue-700 text-white p-6 rounded-lg shadow-md flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold">HOD Dashboard</h1>
-            <p className="mt-2 text-lg">
-              <strong>Name:</strong> {hod.name}
-            </p>
-            
-            <p>
-              <strong>ID:</strong> {hod.HODId}
-            </p>
-            <p>
-              <strong>Email:</strong> {hod.email}
-            </p>
-            <p>
-              <strong>Department:</strong> {hod.department}
-            </p>
-            <p>
-              <strong>Leave Account:</strong> 12 days/year
-            </p>
-            <p>
-              <strong>Approved Leaves:</strong>  {12 - hod.leaveBalance} days
-            </p>
-            <p>
-              <strong>Leave Balance:</strong> {hod.leaveBalance} days
-            </p>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-md shadow-md transition-all"
-          >
-            Logout
-          </button>
-        </div>
+        
+         <div className="w-full bg-white inset-shadow-black rounded-2xl p-6">
+           {/* Top Section: Logout Button & Title */}
+           <div className="flex justify-between items-center">
+             <h1 className="text-xl md:text-2xl font-bold text-gray-800">
+               {hod.department} HOD Dashboard
+             </h1>
+             <button
+               onClick={handleLogout}
+               className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg shadow-md transition-all"
+             >
+               Logout
+             </button>
+           </div>
+   
+           {/* HOD Details Section */}
+           <div className="mt-6 bg-white p-6 rounded-lg shadow-md border border-gray-200">
+             <h2 className="text-lg md:text-xl font-semibold text-gray-700 mb-4">
+               HOD Details
+             </h2>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-600">
+               <p>
+                 <strong className="text-gray-800">Name:</strong> {hod.name}
+               </p>
+               <p>
+                 <strong className="text-gray-800">ID:</strong> {hod.HODId}
+               </p>
+               <p>
+                 <strong className="text-gray-800">Email:</strong> {hod.email}
+               </p>
+               <p>
+                 <strong className="text-gray-800">Department:</strong> {hod.department}
+               </p>
+               <p>
+                 <strong className="text-gray-800">Leave Account:</strong> 12 days/year
+               </p>
+               <p>
+                 <strong className="text-gray-800">Approved Leaves:</strong> {12 - hod.leaveBalance} days
+               </p>
+               <p>
+                 <strong className="text-gray-800">Leave Balance:</strong> {hod.leaveBalance} days
+               </p>
+             </div>
+           </div>
+         </div>
+    
       )}
 
       {/* Apply Leave Button */}
@@ -396,124 +410,105 @@ const HODDashboard = () => {
           </div>
         </div>
       )}
-      {selectedLeave && (
-        <div className="sticky inset-0 flex items-center justify-center  bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl mx-4 transition-all transform duration-300 ease-in-out scale-95 hover:scale-100 max-h-[90vh] sm:max-h-[50vh] overflow-auto">
-            <h2 className="text-lg font-semibold mb-4 text-gray-900 text-center">
-              Update Leave Request
-            </h2>
+    {(selectedLeave  && selectedLeave.status !== "Approved" ) && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-2 sm:p-4">
+    <div className="bg-white my-4 p-4 sm:p-6 rounded-lg shadow-xl w-full max-w-md sm:max-w-lg md:max-w-3xl lg:max-w-4xl h-screen max-h-[90vh] overflow-y-auto transition-transform transform scale-80">
+      <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center text-gray-900">
+        Update Leave Request
+      </h2>
 
-            {/* Leave Request Details Section */}
-            <div className="flex flex-col lg:flex-row gap-6">
-              <div className="flex-1">
-                <p>
-                  <strong>Faculty:</strong>
-                  {selectedLeave.employeeName || hod.name}
-                </p>
-                <p>
-                  <strong>Department:</strong> {hod.department}
-                </p>
-                <p>
-                  <strong>Designation:</strong>{" "}
-                  {selectedLeave.employeeDesignation || "HOD"}{" "}
-                </p>
-                <p>
-                  <strong>Employee ID:</strong>{" "}
-                  {selectedLeave.employeeId || hod.HODId}
-                </p>
-                <p>
-                  <strong>Start Date:</strong>{" "}
-                  {new Date(selectedLeave.startDate).toDateString()}
-                </p>
-                <p>
-                  <strong>End Date:</strong>{" "}
-                  {new Date(selectedLeave.endDate).toDateString()}
-                </p>
-                <p>
-                  <strong>Reason:</strong> {selectedLeave.reason}
-                </p>
-                <p>
-                  <strong>Remarks:</strong>{" "}
-                  {selectedLeave.remarks || "No remarks provided"}
-                </p>
-              </div>
+      {/* Leave Request Details Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-2 text-sm sm:text-base">
+          <p><strong>Faculty:</strong> {selectedLeave.employeeName || hod.name}</p>
+          <p><strong>Department:</strong> {hod.department}</p>
+          <p><strong>Designation:</strong> {selectedLeave.employeeDesignation || "HOD"}</p>
+          <p><strong>Employee ID:</strong> {selectedLeave.employeeemployeeId || hod.HODId}</p>
+          <p><strong>Start Date:</strong> {new Date(selectedLeave.startDate).toDateString()}</p>
+          <p><strong>End Date:</strong> {new Date(selectedLeave.endDate).toDateString()}</p>
+          <p><strong>ReaAAAAson:</strong> {selectedLeave.reason}</p>
+          <p><strong>Remarks:</strong> {selectedLeave.remarks || "No remarks provided"}</p>
+        </div>
 
-              {/* Alternate Schedule Section */}
-
-              {selectedLeave.alternateSchedule && (
-                <div className="flex-1 mt-4 lg:mt-0 p-3 border rounded bg-gray-100">
-                  <h3 className="text-md font-semibold mb-2 text-center">
-                    Alternate Schedule
-                  </h3>
-                  <table className="w-full border-collapse border border-gray-300">
-                    <thead>
-                      <tr className="bg-gray-200">
-                        <th className="border border-gray-300 px-3 py-2 text-left">
-                          Period
-                        </th>
-                        <th className="border border-gray-300 px-3 py-2 text-left">
-                          Lecturer Name
-                        </th>
-                        <th className="border border-gray-300 px-3 py-2 text-left">
-                          Class Assigned
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {selectedLeave.alternateSchedule
-                        .slice() // Create a copy to avoid mutating the original array
-                        .sort((a, b) => a.periodNumber - b.periodNumber) // Sort in ascending order
-                        .map((schedule, index) => (
-                          <tr key={index} className="bg-white">
-                            <td className="border border-gray-300 px-3 py-2">
-                              Period {schedule.periodNumber}
-                            </td>
-                            <td className="border border-gray-300 px-3 py-2">
-                              {schedule.lecturerName || "N/A"}
-                            </td>
-                            <td className="border border-gray-300 px-3 py-2">
-                              {schedule.classAssigned || "N/A"}
-                            </td>
-                          </tr>
-                        ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-
-            {/* Remarks Textarea */}
-            <textarea
-              className="w-full p-3 border rounded mt-6 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Add remarks"
-              value={remarks}
-              onChange={(e) => setRemarks(e.target.value)}
-            />
-
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row justify-between mt-6 gap-3">
-              <button
-                className="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-green-500"
-                onClick={() => handleAction("Forwarded by HOD")}
-              >
-                Forward to Principal
-              </button>
-              <button
-                className="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-red-500"
-                onClick={() => handleAction("Rejected")}
-              >
-                Reject
-              </button>
-              <button
-                className="w-full sm:w-auto bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-gray-500"
-                onClick={() => setSelectedLeave(null)}
-              >
-                Close
-              </button>
+        {/* Alternate Schedule Section */}
+        {(selectedLeave.alternateSchedule) && (
+          <div className="p-3 border rounded-lg bg-blue-50 shadow-md">
+            <h3 className="text-md font-semibold mb-2 text-center text-blue-900">
+              Alternate Schedule
+            </h3>
+            <div className="overflow-x-auto">
+              <table className="w-full border border-gray-300 text-xs sm:text-sm">
+                <thead>
+                  <tr className="bg-blue-100 text-blue-900">
+                    <th className="border p-1 sm:p-2">Period</th>
+                    <th className="border p-1 sm:p-2">Lecturer</th>
+                    <th className="border p-1 sm:p-2">Class</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedLeave.alternateSchedule
+                    .slice()
+                    .sort((a, b) => a.periodNumber - b.periodNumber)
+                    .map((schedule, index) => {
+                      const isAssigned =
+                        schedule.lecturerName &&
+                        schedule.lecturerName.toLowerCase() !== "leisure" &&
+                        schedule.classAssigned;
+                      return (
+                        <tr
+                          key={index}
+                          className={`text-center ${
+                            isAssigned
+                              ? "bg-green-200 text-green-800 font-semibold"
+                              : "bg-black-200 text-red-700 font-semibold"
+                          }`}
+                        >
+                          <td className="border p-1 sm:p-2">Period {schedule.periodNumber}</td>
+                          <td className="border p-1 sm:p-2">{schedule.lecturerName || "Not Assigned"}</td>
+                          <td className="border p-1 sm:p-2">{schedule.classAssigned || "N/A"}</td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
+
+      {/* Remarks Input */}
+      <textarea
+        className="w-full p-3 border rounded mt-6 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="Add remarks"
+        value={remarks}
+        onChange={(e) => setRemarks(e.target.value)}
+      />
+
+      {/* Action Buttons */}
+      <div className="flex flex-col sm:flex-row justify-between mt-6 gap-3">
+        <button
+          className="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-green-500"
+          onClick={() => handleAction("Forwarded by HOD")}
+        >
+          Forward to Principal
+        </button>
+        <button
+          className="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-red-500"
+          onClick={() => handleAction("Rejected")}
+        >
+          Reject
+        </button>
+        <button
+          className="w-full sm:w-auto bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-gray-500"
+          onClick={() => setSelectedLeave(null)}
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
