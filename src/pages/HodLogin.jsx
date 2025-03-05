@@ -5,11 +5,14 @@ import "font-awesome/css/font-awesome.min.css"; // Importing Font Awesome
 const HodLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true); // Show loading spinner
+      
       const response = await fetch("https://pydah-lms-backend.onrender.com/api/hod/hod-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -17,6 +20,7 @@ const HodLogin = () => {
       });
 
       const data = await response.json();
+      setLoading(false); // Hide loading spinner
       if (response.ok) {
         localStorage.setItem("hodtoken", data.hodtoken);
         alert("Login Successful!");
@@ -25,10 +29,24 @@ const HodLogin = () => {
         alert(data.msg);
       }
     } catch (error) {
+      setLoading(false); // Hide loading spinner
       console.error("Login Error:", error);
     }
   };
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="flex flex-col items-center">
+          {/* Animated Loader */}
+          <div className="w-16 h-16 border-4 border-primary  rounded-2xl animate-spin"></div>
 
+          <p className="mt-4 text-lg font-semibold text-gray-700">
+            Processing Your Request, please wait...
+          </p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-maroon to-darkGold px-4 sm:px-6 lg:px-8">
     <div className="w-full max-w-md bg-secondary shadow-outerRaised rounded-neumorphic p-6 sm:p-8">

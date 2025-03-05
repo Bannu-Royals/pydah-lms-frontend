@@ -6,9 +6,11 @@ const EmployeeDashboard = () => {
   const [employee, setEmployee] = useState(null);
   const [showLeaveForm, setShowLeaveForm] = useState(false);
   const [selectedLeave, setSelectedLeave] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
+    setLoading(true);
     const fetchEmployee = async () => {
       const token = localStorage.getItem("token");
       const employeeId = localStorage.getItem("employeeId");
@@ -37,6 +39,7 @@ const EmployeeDashboard = () => {
     };
 
     fetchEmployee();
+    setLoading(false);
   }, [navigate]);
 
   const handleLogout = () => {
@@ -46,6 +49,21 @@ const EmployeeDashboard = () => {
       navigate("/login");
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="flex flex-col items-center">
+          {/* Animated Loader */}
+          <div className="w-16 h-16 border-4 border-primary  rounded-2xl animate-spin"></div>
+
+          <p className="mt-4 text-lg font-semibold text-gray-700">
+            Processing Your Request, please wait...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 md:p-6 bg-background min-h-screen">

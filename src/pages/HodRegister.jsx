@@ -9,6 +9,7 @@ const HodRegister = () => {
   const [department, setDepartment] = useState("");
   const [emailValid, setEmailValid] = useState(false);
   const [customDepartment, setCustomDepartment] = useState("");
+  const [loading, setLoading] = useState(false);
   const [passwordConditions, setPasswordConditions] = useState({
     length: false,
     uppercase: false,
@@ -59,6 +60,7 @@ const HodRegister = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const finalDepartment = department === "Others" ? customDepartment : department;
     try {
       const response = await fetch("https://pydah-lms-backend.onrender.com/api/hod/hod-register", {
@@ -68,6 +70,7 @@ const HodRegister = () => {
       });
 
       const data = await response.json();
+      setLoading(false); // Hide loading spinner
       if (response.ok) {
         alert("Registration Successful! Please login.");
         navigate("/hod-login");
@@ -75,9 +78,24 @@ const HodRegister = () => {
         alert(data.msg);
       }
     } catch (error) {
+      setLoading(false); // Hide loading spinner
       console.error("Registration Error:", error);
     }
   };
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="flex flex-col items-center">
+          {/* Animated Loader */}
+          <div className="w-16 h-16 border-4 border-primary  rounded-2xl animate-spin"></div>
+
+          <p className="mt-4 text-lg font-semibold text-gray-700">
+            Processing Your Request, please wait...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-maroon to-darkGold px-4 sm:px-6 lg:px-8">

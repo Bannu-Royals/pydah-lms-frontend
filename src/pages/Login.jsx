@@ -4,6 +4,7 @@ import 'animate.css';
 
 const Login = () => {
   const [customDepartment, setCustomDepartment] = useState("");
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -87,6 +88,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(""); // Clear previous errors
+    setLoading(true);
 
     const endpoint = isRegistering ? "/register" : `/login/${role}`;
 
@@ -105,14 +107,18 @@ const Login = () => {
       );
 
       const data = await response.json();
+      setLoading(false);
       if (!response.ok) return setError(data.msg || "Something went wrong");
 
       if (isRegistering) {
+
         alert("Registration successful! Please login.");
+        setLoading(false);
         setIsRegistering(false);
       } else {
         localStorage.setItem("token", data.token);
         localStorage.setItem("employeeId", data.employeeId);
+        setLoading(false);
         navigate(
           role === "employee" ? "/employee-dashboard" : "/admin-dashboard"
         );
@@ -121,6 +127,20 @@ const Login = () => {
       setError("Server error. Please try again.");
     }
   };
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="flex flex-col items-center">
+          {/* Animated Loader */}
+          <div className="w-16 h-16 border-4 border-primary  rounded-2xl animate-spin"></div>
+
+          <p className="mt-4 text-lg font-semibold text-gray-700">
+            Processing Your Request, please wait...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-maroon to-darkGold px-4 sm:px-6 lg:px-8">
