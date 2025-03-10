@@ -500,7 +500,7 @@ const exportToPDF = () => {
   const collegeAddress = "An Autonomous Institution Kakinada | Andhra Pradesh | INDIA";
   const contactNumber = "Contact: +91-9392604899";
 
-  const title = `Approved Leaves ${departmentTitle} - ${mostFrequentMonth}`;
+  const title = `Approved Leaves ${departmentTitle} - ${mostFrequentMonth} - 2025`;
 
   // ** Add College Name & Address in Center **
   doc.setFont("times", "bold");
@@ -575,7 +575,7 @@ const exportToPDF = () => {
     doc.text(`Generated on: ${timestamp}`, 10, finalY);
 
     // ** Save the PDF **
-    doc.save("Approved_Leave_Requests.pdf");
+    doc.save(`Approved_Leave_Requests_${mostFrequentMonth}.pdf`);
   };
 
   // Fallback: If the image doesn't load in time, still generate PDF without it
@@ -585,7 +585,7 @@ const exportToPDF = () => {
       doc.text(title, doc.internal.pageSize.width / 2, 40, { align: "center" });
       autoTable(doc, { startY: 50, head: headers, body: tableData });
       doc.text(`Generated on: ${timestamp}`, 10, doc.lastAutoTable.finalY + 20);
-      doc.save("Approved_Leave_Requests.pdf");
+      doc.save(`Approved_Leave_Requests_${mostFrequentMonth}.pdf`);
     }
   }, 3000);
 };
