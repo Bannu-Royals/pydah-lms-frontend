@@ -189,7 +189,7 @@ const HodRegister = () => {
             <option value="ECE">ECE</option>
             <option value="Mech">Mech</option>
             <option value="Civil">Civil</option>
-            <option value="Non-Technical">Non-Technical</option>
+            <option value="Non-Teaching">Non-Teaching</option>
             <option value="Others">Others</option>
           </select>
   
