@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaComments, FaFilter } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
+import {jsPDF} from "jspdf";
+import autoTable from "jspdf-autotable"; // Import autoTable correctly
 import * as XLSX from "xlsx-js-style";
+
 
 const AdminDashboard = () => {
   const [leaveRequests, setLeaveRequests] = useState([]);
@@ -63,7 +65,9 @@ const AdminDashboard = () => {
       .catch((error) => console.error("Error fetching leave requests", error));
 
     axios
-      .get("https://pydah-lms-backend.onrender.com/api/admin/hod-leave-requests")
+      .get(
+        "https://pydah-lms-backend.onrender.com/api/admin/hod-leave-requests"
+      )
       .then((response) => {
         const formattedHodRequests = response.data.leaveRequests.map(
           (request) => ({
@@ -116,10 +120,10 @@ const AdminDashboard = () => {
     const { employeeId, leaveRequestId, status, isHodRequest } =
       selectedRequest;
 
-    // Set default remarks if none provided
-    const finalRemarks =
-      remarks.trim() ||
+      const finalRemarks =
+      (remarks && remarks.trim()) ||
       (status === "Approved" ? "Approved by admin" : "Rejected by admin");
+    
 
     // API URL based on whether it's an HOD request or Faculty request
     const url = isHodRequest
@@ -407,6 +411,189 @@ const AdminDashboard = () => {
     setExcelFile(fileURL); // Store file URL in state
   };
 
+const logoBase64 = "";
+
+const exportToPDF = () => {
+  let allFilteredLeaves = [...filteredRequests, ...filteredHodRequests];
+
+  // Filter only approved requests
+  let approvedRequests = allFilteredLeaves.filter(
+    (req) => req.leaveRequest && req.leaveRequest.status === "Approved"
+  );
+
+  if (approvedRequests.length === 0) {
+    alert("No approved leave requests available for export.");
+    return;
+  }
+
+  // Identify if all requests belong to a single department
+  let uniqueDepartments = [
+    ...new Set(approvedRequests.map((req) => req.department)),
+  ];
+  let departmentTitle =
+    uniqueDepartments.length === 1 ? `${uniqueDepartments[0]}` : "";
+
+  // Identify the month with the most leave days
+  let monthCount = {};
+  approvedRequests.forEach((req) => {
+    let startDate = new Date(req.leaveRequest.startDate);
+    let endDate = new Date(req.leaveRequest.endDate);
+
+    while (startDate <= endDate) {
+      let monthKey = startDate.toLocaleString("en-US", { month: "long" });
+      monthCount[monthKey] = (monthCount[monthKey] || 0) + 1;
+      startDate.setDate(startDate.getDate() + 1); // Move to next day
+    }
+  });
+
+  let mostFrequentMonth = Object.keys(monthCount).reduce((a, b) =>
+    monthCount[a] > monthCount[b] ? a : b
+  );
+
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString("en-US", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
+  // Prepare table data
+  const tableData = approvedRequests.map((req, index) => {
+    const startDate = new Date(req.leaveRequest.startDate);
+    const endDate = new Date(req.leaveRequest.endDate);
+    const diffDays = Math.ceil((endDate - startDate) / (1000 * 3600 * 24));
+
+    return [
+      index + 1, // Serial No
+      req.hodName || req.name, // Name
+      req.department || "N/A", // Department
+      req.hodId || req.employeeId, // Employee ID
+      req.leaveRequest.leaveType, // Leave Type
+      `${formatDate(req.leaveRequest.startDate)} - ${formatDate(req.leaveRequest.endDate)}`, // Leave Period
+      diffDays + 1, // No. of Days
+      req.leaveRequest.reason, // Reason
+      req.leaveRequest.remarks || "No remarks", // Remarks
+    ];
+  });
+
+  // Column Headers
+  const headers = [
+    [
+      "S. No",
+      "Name",
+      "Department",
+      "Employee ID",
+      "Leave Type",
+      "On Leave Period",
+      "No. of Days",
+      "Reason",
+      "Remarks",
+    ],
+  ];
+
+  // Initialize jsPDF in Landscape mode
+  const doc = new jsPDF("landscape");
+
+  // ** College Letterhead Details **
+  const collegeName = "Pydah College of Engineering";
+  const collegeAddress = "An Autonomous Institution Kakinada | Andhra Pradesh | INDIA";
+  const contactNumber = "Contact: +91-9392604899";
+
+  const title = `Approved Leaves ${departmentTitle} - ${mostFrequentMonth}`;
+
+  // ** Add College Name & Address in Center **
+  doc.setFont("times", "bold");
+  doc.setTextColor("#333"); // Dark text
+  doc.setFontSize(24);
+  doc.text(collegeName, doc.internal.pageSize.width / 2, 15, { align: "center" });
+
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "normal");
+  doc.text(collegeAddress, doc.internal.pageSize.width / 2, 22, { align: "center" });
+
+  // ** Add College Logo on the Right **
+  const logoUrl =
+    "https://static.wixstatic.com/media/bfee2e_7d499a9b2c40442e85bb0fa99e7d5d37~mv2.png"; // Replace with actual URL
+  const logoWidth = 60;
+  const logoHeight = 30;
+
+  const img = new Image();
+  img.src = logoUrl;
+  img.onload = function () {
+    doc.addImage(img, "PNG", 10, 5, logoWidth, logoHeight);
+
+    // ** Add Title Below Header **
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor("#D35400"); // Light Orange Theme
+    doc.text(title, doc.internal.pageSize.width / 2, 40, { align: "center" });
+
+    // ** Add table using autoTable function **
+    autoTable(doc, {
+      startY: 50,
+      head: headers,
+      body: tableData,
+      styles: { fontSize: 10, cellPadding: 3 },
+      headStyles: {
+        fillColor: [255, 213, 128],
+        textColor: [0, 0, 0],
+        fontStyle: "bold",
+      }, // Light Orange Header
+      theme: "grid",
+      margin: { left: 10, right: 10 },
+      tableWidth: "auto",
+      didDrawPage: function (data) {
+        // ** Footer with College Name & Contact **
+        let pageHeight = doc.internal.pageSize.height;
+        doc.setFontSize(10);
+        doc.setTextColor("#333");
+        doc.text(collegeName, 10, pageHeight - 10);
+        doc.text(contactNumber, doc.internal.pageSize.width / 2, pageHeight - 10, {
+          align: "center",
+        });
+
+        // ** Page Numbers at Bottom Right **
+        let pageNumber = doc.internal.getNumberOfPages();
+        doc.text(`Page ${pageNumber}`, doc.internal.pageSize.width - 20, pageHeight - 10);
+      },
+    });
+
+    // ** Add Timestamp on the Last Page at Bottom Left **
+    let finalY = doc.lastAutoTable.finalY + 20;
+    let timestamp = new Date().toLocaleString("en-US", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
+
+    doc.setFontSize(10);
+    doc.setTextColor("#333");
+    doc.text(`Generated on: ${timestamp}`, 10, finalY);
+
+    // ** Save the PDF **
+    doc.save("Approved_Leave_Requests.pdf");
+  };
+
+  // Fallback: If the image doesn't load in time, still generate PDF without it
+  setTimeout(() => {
+    if (!img.complete) {
+      console.warn("Logo image failed to load, generating PDF without it.");
+      doc.text(title, doc.internal.pageSize.width / 2, 40, { align: "center" });
+      autoTable(doc, { startY: 50, head: headers, body: tableData });
+      doc.text(`Generated on: ${timestamp}`, 10, doc.lastAutoTable.finalY + 20);
+      doc.save("Approved_Leave_Requests.pdf");
+    }
+  }, 3000);
+};
+
+
+  
+  
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");
@@ -470,6 +657,12 @@ const AdminDashboard = () => {
               Logout
             </button>
           </div>
+          <button
+            onClick={exportToPDF}
+            className="px-4 py-2 bg-green-600 text-white rounded"
+          >
+            Download PDF
+          </button>
 
           {/* Export Buttons (Stacked on small screens) */}
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">

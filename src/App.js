@@ -8,6 +8,7 @@ import HodRegister from "./pages/HodRegister"; // Import HOD Registration page
 import HodDashboard from "./pages/HodDashboard"; // Import HOD Dashboard
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import "./App.css"; // Import App CSS file
 
 import Home from "./components/Home"
 

@@ -8,6 +8,7 @@ import 'animate.css';
 import PIC from './images/PYDAH LOGO.png';
 import Durga_Prasad from './images/PIC_DP.jpg';
 import Ravi from './images/ravi_IMAGE.jpg';
+import PullToRefresh from "./PullToRefresh";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -26,9 +27,14 @@ export default function Home() {
   <script>
   AOS.init();
 </script>
+const handleRefresh = () => {
+  console.log("Refreshing data...");
+  // Call API or refresh state here
+};
 
   return (
     <div className="flex flex-col min-h-screen bg-secondary text-textDark ">
+      <PullToRefresh onRefresh={handleRefresh} />
       {/* Hero Section */}
       <div className="sticky flex flex-col md:flex-row items-center justify-around px-6 py-16 md:py-32 bg-secondary shadow-outRaised text-textDark border-b-8 border-primary rounded-neumorphic ">
       <div className="max-w-3xl">
@@ -62,7 +68,7 @@ export default function Home() {
     </div>
 
         {/* Slider Section */}
-        <div className="mt-8 md:mt-0 max-w-2xl w-full rounded-neumorphic shadow-innerSoft overflow-hidden">
+        <div className="mt-8 md:mt-0 max-w-2xl w-full rounded-neumorphic shadow-outerRaised p-2 overflow-hidden">
           <Slider {...sliderSettings}>
             <div>
               <img
@@ -141,22 +147,22 @@ export default function Home() {
 
   <div className="flex flex-col sm:flex-row justify-center gap-8 mt-10">
     {/* Developer - Ravi */}
-    <div className="p-6 bg-white rounded-neumorphic shadow-outerRaised text-center max-w-xs">
+    <div className="p-6 bg-background rounded-neumorphic shadow-outerRaised text-center max-w-xs">
       <img
         src={Ravi}
         alt="Ravi"
-        className="w-32 h-32 mx-auto rounded-full shadow-md"
+        className="w-32 h-32 mx-auto rounded-full shadow-outerRaised"
       />
       <h3 className="text-xl font-semibold text-primary mt-4">Ravi</h3>
       <p className="text-textDark">Full Stack Developer</p>
-      <p className="mt-2 text-sm text-gray-600">
+      <p className="mt-2 text-sm text-gray-600 shadow-inner rounded-md p-2">
         With expertise in <strong>MERN Stack & REST APIs</strong>, Ravi ensures <strong>seamless integration</strong> between frontend and backend, optimizing database performance and API security.
       </p>
       <a
         href="https://www.linkedin.com/in/ravi-buraga-54b0bb280/"
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-4 inline-block px-4 py-2 bg-primary text-textLight rounded-neumorphic shadow-md 
+        className="mt-4 inline-block px-4 py-2 bg-primary text-textLight rounded-neumorphic shadow-outerRaised
                    hover:shadow-none active:shadow-innerSoft transition-all duration-300"
       >
         LinkedIn Profile
@@ -164,22 +170,22 @@ export default function Home() {
     </div>
 
     {/* Developer - Durga Prasad */}
-    <div className="p-6 bg-white rounded-neumorphic shadow-outerRaised text-center max-w-xs">
+    <div className="p-6 bg-background rounded-neumorphic shadow-outerRaised text-center max-w-xs">
       <img
         src={Durga_Prasad}
         alt="Durga Prasad"
-        className="w-32 h-32 mx-auto rounded-full shadow-md"
+        className="w-32 h-32 mx-auto rounded-full shadow-outerRaised"
       />
       <h3 className="text-xl font-semibold text-primary mt-4">Durga Prasad</h3>
       <p className="text-textDark">Full Stack Developer</p>
-      <p className="mt-2 text-sm text-gray-600">
+      <p className="mt-2  text-sm text-gray-600 rounded-md p-2 shadow-inner">
         Skilled in <strong>React, Node.js, and MongoDB</strong>,specializes in building <strong>responsive web applications</strong>. He is passionate about clean UI/UX and backend optimization.
       </p>
       <a
         href="https://www.linkedin.com/in/durga-prasad-kakileti-bannu/"
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-4 inline-block px-4 py-2 bg-primary text-textLight rounded-neumorphic shadow-md 
+        className="mt-4 inline-block px-4 py-2 bg-primary text-textLight rounded-neumorphic shadow-outerRaised
                    hover:shadow-none active:shadow-innerSoft transition-all duration-300"
       >
         LinkedIn Profile
