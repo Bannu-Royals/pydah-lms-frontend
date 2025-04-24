@@ -498,7 +498,7 @@ const exportToPDF = () => {
   // ** College Letterhead Details **
   const collegeName = "Pydah College of Engineering";
   const collegeAddress = "An Autonomous Institution Kakinada | Andhra Pradesh | INDIA";
-  const contactNumber = "Contact: +91-9392604899";
+  const contactNumber = "Contact: +91 99513 54444";
 
   const title = `Approved Leaves ${departmentTitle} - ${mostFrequentMonth} - 2025`;
 
@@ -558,6 +558,11 @@ const exportToPDF = () => {
         doc.text(`Page ${pageNumber}`, doc.internal.pageSize.width - 20, pageHeight - 10);
       },
     });
+    // ** Add Authorization Signature at Right Bottom **
+let signatureY = doc.lastAutoTable.finalY + 30; // Adjust positioning if needed
+doc.setFontSize(12);
+doc.setFont("helvetica", "bold");
+doc.text("Principal Signature", doc.internal.pageSize.width - 60, signatureY);
 
     // ** Add Timestamp on the Last Page at Bottom Left **
     let finalY = doc.lastAutoTable.finalY + 20;
