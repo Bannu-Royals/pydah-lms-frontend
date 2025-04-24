@@ -7,6 +7,7 @@ const HodRegister = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [department, setDepartment] = useState("");
+  const [HODId, setHODId] = useState(""); // New state for HODId
   const [emailValid, setEmailValid] = useState(false);
   const [customDepartment, setCustomDepartment] = useState("");
   const [loading, setLoading] = useState(false);
@@ -48,6 +49,10 @@ const HodRegister = () => {
     if (name === "department") {
       setDepartment(value);
     }
+
+    if (name === "HODId") {
+      setHODId(value);
+    }
   };
 
   const handleDepartmentChange = (e) => {
@@ -66,7 +71,13 @@ const HodRegister = () => {
       const response = await fetch("https://pydah-lms-backend.onrender.com/api/hod/hod-register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, department: finalDepartment }),
+        body: JSON.stringify({ 
+          name, 
+          email, 
+          password, 
+          department: finalDepartment,
+          HODId // Including HODId in the request
+        }),
       });
 
       const data = await response.json();
@@ -116,6 +127,20 @@ const HodRegister = () => {
             required
           />
         </div>
+        
+        {/* New HOD ID Field */}
+        <div className="mb-4">
+          <label className="block text-primary font-medium">HOD ID <span className="text-red-500">*</span></label>
+          <input
+            type="text"
+            name="HODId"
+            className="w-full p-3 border-none rounded-neumorphic bg-background shadow-innerInset focus:outline-none focus:ring-2 focus:ring-primary"
+            placeholder="Enter your HOD ID"
+            value={HODId}
+            onChange={handleChange}
+            required
+          />
+        </div>
   
         <div className="mb-4">
           <label className="block text-primary font-medium">Email</label>
@@ -150,7 +175,7 @@ const HodRegister = () => {
           <ul className="text-sm mt-2 space-y-1">
             {Object.entries(passwordConditions).map(([key, value]) => (
               <li key={key} className={`ml-4 ${value ? "text-green-600" : "text-red-500"}`}>
-                ✅ {key.replace(/([A-Z])/g, " $1").trim()}
+                {value ? "✅" : "❌"} {key.replace(/([A-Z])/g, " $1").trim()}
               </li>
             ))}
           </ul>
@@ -209,11 +234,11 @@ const HodRegister = () => {
         <button
           type="submit"
           className={`w-full text-textLight p-3 rounded-neumorphic font-semibold shadow-outerRaised transition-all duration-300 ${
-            emailValid && isPasswordValid && confirmPasswordValid
+            emailValid && isPasswordValid && confirmPasswordValid && HODId
               ? "bg-primary hover:bg-darkGold"
               : "bg-gray-400 cursor-not-allowed"
           }`}
-          disabled={!emailValid || !isPasswordValid || !confirmPasswordValid}
+          disabled={!emailValid || !isPasswordValid || !confirmPasswordValid || !HODId}
         >
           Register
         </button>
