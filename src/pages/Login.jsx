@@ -101,7 +101,7 @@ const Login = () => {
           body: JSON.stringify(
             isRegistering
               ? formData
-              : { email: formData.email, password: formData.password }
+              : { employeeId: formData.employeeId, password: formData.password }
           ),
         }
       );

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "font-awesome/css/font-awesome.min.css"; // Importing Font Awesome
 
 const HodLogin = () => {
-  const [email, setEmail] = useState("");
+  const [HODId, setHODId] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ const HodLogin = () => {
       const response = await fetch("https://pydah-lms-backend.onrender.com/api/hod/hod-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ HODId, password }),
       });
 
       const data = await response.json();
@@ -64,13 +64,13 @@ const HodLogin = () => {
       
       <form onSubmit={handleLogin}>
         <div className="mb-4">
-          <label className="block text-primary font-medium">Email</label>
+          <label className="block text-primary font-medium">HODId</label>
           <input
-            type="email"
+            type="number"
             className="w-full p-3 border-none rounded-neumorphic bg-background shadow-innerInset focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="Enter email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter HODId"
+            value={HODId}
+            onChange={(e) => setHODId(e.target.value)}
             required
           />
         </div>
