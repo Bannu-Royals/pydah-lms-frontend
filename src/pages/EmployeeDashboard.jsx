@@ -89,6 +89,9 @@ const EmployeeDashboard = () => {
                 <strong className="capitalize">{key.replace(/__v/g, "Applied Leave Requests").replace(/_/g, " ")}</strong>: {value}
               </div>
             ))}
+            <p>
+       <strong className="text-primary">Approved Leaves:</strong> {12 - employee.leaveBalance} days
+     </p>
         </div>
       </div>
     )}
