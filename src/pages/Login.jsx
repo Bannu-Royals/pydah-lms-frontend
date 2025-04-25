@@ -192,16 +192,7 @@ const Login = () => {
                 required
               />
             </div>
-            <div className="input-group">
-              <input
-                type="number"
-                name="employeeId"
-                placeholder="Employee ID"
-                value={formData.employeeId}
-                onChange={handleChange}
-                required
-              />
-            </div>
+      
             <div className="input-group">
               <select
                 name="department"

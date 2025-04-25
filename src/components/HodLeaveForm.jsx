@@ -14,8 +14,8 @@ const HodLeaveForm = ({ onClose, hodId, leaveBalance }) => {
     "Casual Leave",
     "Cost Casual Leave",
     "Medical Leave",
-    "Earned Leave",
-    "Special Leave"
+    "Paid Leave",
+    "On Duty"
   ];
 
   // Add a new period to the alternate schedule
