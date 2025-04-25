@@ -88,10 +88,12 @@ const EmployeeDashboard = () => {
               <div key={key} className="border-b pb-2 text-textDark">
                 <strong className="capitalize">{key.replace(/__v/g, "Applied Leave Requests").replace(/_/g, " ")}</strong>: {value}
               </div>
+              
             ))}
+             <div  className="border-b pb-2 text-textDark">
             <p>
-       <strong className="text-textDark">Approved Leaves:</strong> {12 - employee.leaveBalance} days
-     </p>
+       <strong className="text-textDark">Approved Leaves:</strong> {12 - employee.leaveBalance} days 
+     </p></div>
         </div>
       </div>
     )}
