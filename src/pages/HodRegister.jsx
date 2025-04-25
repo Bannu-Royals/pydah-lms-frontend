@@ -210,14 +210,15 @@ const HodRegister = () => {
           >
             <option value="" disabled>Select Department</option>
             <option value="CSE">CSE</option>
-            <option value="Agriculture">Agriculture</option>
+            <option value="Agriculture">Agriculture - Mech - Civil</option>
             <option value="ECE">ECE</option>
-            <option value="Mech">Mech</option>
-            <option value="Civil">Civil</option>
+            <option value="Diploma-CSE">Diploma-CSE</option>
+            <option value="Diploma-ECE">Diploma-ECE</option>
+            <option value="Diploma-MECH">Diploma-MECH</option>
+            <option value="HBS">HBS</option>
             <option value="Non-Teaching">Non-Teaching</option>
             <option value="Others">Others</option>
           </select>
-  
           {department === "Others" && (
             <input
               type="text"
