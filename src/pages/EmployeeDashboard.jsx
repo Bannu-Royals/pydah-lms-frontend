@@ -90,7 +90,7 @@ const EmployeeDashboard = () => {
               </div>
             ))}
             <p>
-       <strong className="text-primary">Approved Leaves:</strong> {12 - employee.leaveBalance} days
+       <strong className="text-textDark">Approved Leaves:</strong> {12 - employee.leaveBalance} days
      </p>
         </div>
       </div>
