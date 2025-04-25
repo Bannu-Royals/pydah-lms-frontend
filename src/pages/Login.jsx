@@ -83,7 +83,7 @@ const Login = () => {
   const isPasswordValid = Object.values(passwordConditions).every(Boolean);
   const isFormValid = isRegistering
     ? isPasswordValid && confirmPasswordValid && emailValid && mobileValid
-    : formData.email && formData.password;
+    : formData.employeeId && formData.password;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
