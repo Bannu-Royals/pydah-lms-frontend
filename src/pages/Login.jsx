@@ -194,7 +194,7 @@ const Login = () => {
             </div>
             <div className="input-group">
               <input
-                type="text"
+                type="number"
                 name="employeeId"
                 placeholder="Employee ID"
                 value={formData.employeeId}
@@ -253,6 +253,20 @@ const Login = () => {
               />
             </div>
             <div className="input-group">
+          <input 
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        {isRegistering && !emailValid && formData.email && (
+          <p className="text-red-500 text-sm mt-1">❌ Enter a valid email</p>
+        )}
+
+            <div className="input-group">
               <input
                 type="text"
                 name="mobileNo"
@@ -269,21 +283,18 @@ const Login = () => {
             )}
           </>
         )}
-
         <div className="input-group">
-          <input 
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        {isRegistering && !emailValid && formData.email && (
-          <p className="text-red-500 text-sm mt-1">❌ Enter a valid email</p>
-        )}
+              <input
+                type="number"
+                name="employeeId"
+                placeholder="Employee ID"
+                value={formData.employeeId}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
+        
         <div className="input-group">
           <input
           class=" font-medium"
