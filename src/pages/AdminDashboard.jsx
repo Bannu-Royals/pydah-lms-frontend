@@ -56,7 +56,6 @@ const AdminDashboard = () => {
         );
 
         setLeaveRequests(formattedRequests);
-        console.log(formattedRequests);
 
         setFilteredRequests(
           formattedRequests.filter(
@@ -71,8 +70,11 @@ const AdminDashboard = () => {
 
     axios
       .get(
-        "https://pydah-lms-backend.onrender.com/api/admin/hod-leave-requests"
-      )
+        "https://pydah-lms-backend.onrender.com/api/admin/hod-leave-requests",{
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
       .then((response) => {
         const formattedHodRequests = response.data.leaveRequests.map(
           (request) => ({
@@ -90,7 +92,7 @@ const AdminDashboard = () => {
         );
 
         setHodLeaveRequests(formattedHodRequests);
-        console.log(formattedHodRequests);
+
 
         setFilteredHodRequests(
           formattedHodRequests.filter(
