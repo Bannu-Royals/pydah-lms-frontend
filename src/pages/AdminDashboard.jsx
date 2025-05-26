@@ -26,6 +26,7 @@ const AdminDashboard = () => {
   // const [allFilteredLeaves, setAllFilteredLeaves] = useState([]);
   const [refreshTrigger, setRefreshTrigger] = useState(false); // State to trigger re-fetch
   const [filterDepartment, setFilterDepartment] = useState("");
+  const token = localStorage.getItem("token");
 
   const navigate = useNavigate();
 
@@ -33,7 +34,11 @@ const AdminDashboard = () => {
     const today = new Date().toISOString().split("T")[0];
 
     axios
-      .get("https://pydah-lms-backend.onrender.com/api/admin/leave-requests")
+       .get("https://pydah-lms-backend.onrender.com/api/admin/leave-requests", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
       .then((response) => {
         const formattedRequests = response.data.leaveRequests.map(
           (request) => ({
