@@ -110,7 +110,7 @@ if (isRegistering) {
           body: JSON.stringify(
             isRegistering
               ? formData
-              : { employeeId: formData.employeeId, password: formData.password }
+              : { employeeId: parseInt(formData.employeeId) , password: formData.password }
           ),
         }
       );
