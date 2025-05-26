@@ -97,7 +97,7 @@ if (isRegistering) {
 } else if (role === "admin") {
   endpoint = "/admin";
 } else {
-  endpoint = "/login/admin";
+  endpoint = `/login/${role}`;
 }
 
     console.log(endpoint);
