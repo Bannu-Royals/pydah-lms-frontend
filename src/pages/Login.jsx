@@ -91,7 +91,7 @@ const Login = () => {
     setLoading(true);
 
     const endpoint = isRegistering ? "/register" : `/login/${role}`;
-
+    console.log(endpoint);
     try {
       const response = await fetch(
         `https://pydah-lms-backend.onrender.com/api/auth${endpoint}`,
