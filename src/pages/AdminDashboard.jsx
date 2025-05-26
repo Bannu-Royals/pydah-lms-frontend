@@ -129,7 +129,7 @@ const AdminDashboard = () => {
 
       const finalRemarks =
       (remarks && remarks.trim()) ||
-      (status === "Approved" ? "Approved by admin" : "Rejected by admin");
+      (status === "Approved" ? "Approved by Principal Sir" : "Rejected by Principal Sir");
     
 
     // API URL based on whether it's an HOD request or Faculty request
@@ -140,12 +140,21 @@ const AdminDashboard = () => {
     console.log(employeeId, leaveRequestId, status);
 
     try {
-      const response = await axios.put(url, {
-        employeeId,
-        leaveRequestId,
-        status,
-        remarks: finalRemarks,
-      });
+const response = await axios.put(
+  url,
+  {
+    employeeId,
+    leaveRequestId,
+    status,
+    remarks: finalRemarks,
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`, // replace with your actual token or variable
+      'Content-Type': 'application/json', // optional, usually default for JSON
+    },
+  }
+);
 
       if (response.status === 200) {
         alert("Leave request updated successfully!");
