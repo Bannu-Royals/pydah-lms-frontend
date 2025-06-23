@@ -90,15 +90,15 @@ const Login = () => {
     setError(""); // Clear previous errors
     setLoading(true);
 
-    // const endpoint = isRegistering ? "/register" : (role === "admin" ? "/admin" : "/login/admin");
-    let endpoint;
-if (isRegistering) {
-  endpoint = "/register";
-} else if (role === "admin") {
-  endpoint = "/admin";
-} else {
-  endpoint = `/login/${role}`;
-}
+    const endpoint = isRegistering ? "/register" : (role === "admin" ? "/admin" : "/login/admin");
+//     let endpoint;
+// if (isRegistering) {
+//   endpoint = "/register";
+// } else if (role === "admin") {
+//   endpoint = "/admin";
+// } else {
+//   endpoint = `/login/${role}`;
+// }
 
     console.log(endpoint);
     try {
