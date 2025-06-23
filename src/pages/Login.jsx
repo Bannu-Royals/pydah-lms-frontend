@@ -90,7 +90,7 @@ const Login = () => {
     setError(""); // Clear previous errors
     setLoading(true);
 
-    const endpoint = isRegistering ? "/register" : (role === "admin" ? "/admin" : "/login/admin");
+    const endpoint = isRegistering ? "/register" : (role === "admin" ? "/login/admin" : "/login/${role}");
 //     let endpoint;
 // if (isRegistering) {
 //   endpoint = "/register";
