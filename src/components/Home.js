@@ -39,8 +39,11 @@ const handleRefresh = () => {
 <div className="sticky flex flex-col md:flex-row items-center justify-around px-6 py-16 md:py-32 bg-secondary shadow-outRaised text-textDark border-b-8 border-primary rounded-neumorphic ">
   <div className="max-w-3xl">
     {/* Overlay message for unavailable LMS */}
+    <h1 className="text-4xl md:text-5xl font-heading mb-4">
+      Staff Leave Management System
+    </h1>
     <div className="bg-warning p-4 rounded-lg mb-4 shadow-md">
-      <p className="text-lg font-semibold text-black">
+      <p className="text-lg font-semibold text-green-600">
         The PYDAH LMS is not available on this site. Please visit{" "}
         <a
           href="https://pydah-faculty-lms.vercel.app/"
@@ -54,21 +57,11 @@ const handleRefresh = () => {
       </p>
     </div>
 
-    <h1 className="text-4xl md:text-5xl font-heading mb-4">
-      Staff Leave Management System
-    </h1>
+    
 
-    <p className="mt-4 text-lg text-black">
-      Streamline leave tracking for faculty and staff effortlessly.
-    </p>
+   
 
-    <button
-      className="mt-6 px-6 py-3 bg-accent text-textDark font-semibold rounded-neumorphic shadow-md
-                 hover:shadow-none border-2 border-primary active:shadow-innerSoft transition-all duration-300"
-      onClick={() => navigate("/login")}
-    >
-      Get Started
-    </button>
+    
   </div>
 </div>
       {/* About College Section */}
