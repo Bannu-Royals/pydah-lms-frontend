@@ -36,58 +36,41 @@ const handleRefresh = () => {
     <div className="flex flex-col min-h-screen bg-secondary text-textDark ">
       <PullToRefresh onRefresh={handleRefresh} />
       {/* Hero Section */}
-      <div className="sticky flex flex-col md:flex-row items-center justify-around px-6 py-16 md:py-32 bg-secondary shadow-outRaised text-textDark border-b-8 border-primary rounded-neumorphic ">
-      <div className="max-w-3xl">
-      {/* Typing Effect Heading */}
-      <h1 className="text-4xl md:text-5xl font-heading">
-        <ReactTyped
-          strings={[
-            "Staff Leave Management System",
-            "Seamless Leave Tracking",
-            "Manage Leaves Effortlessly",
-          ]}
-          typeSpeed={50}
-          backSpeed={30}
-          loop
-        />
-      </h1>
-
-      <p className="mt-4 text-lg text-black">
-        Streamline leave tracking for faculty and staff effortlessly.
+<div className="sticky flex flex-col md:flex-row items-center justify-around px-6 py-16 md:py-32 bg-secondary shadow-outRaised text-textDark border-b-8 border-primary rounded-neumorphic ">
+  <div className="max-w-3xl">
+    {/* Overlay message for unavailable LMS */}
+    <div className="bg-warning p-4 rounded-lg mb-4 shadow-md">
+      <p className="text-lg font-semibold text-black">
+        The PYDAH LMS is not available on this site. Please visit{" "}
+        <a
+          href="https://pydah-faculty-lms.vercel.app/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary underline font-semibold"
+        >
+          this link
+        </a>
+        .
       </p>
-
-      <button
-      
-        className="mt-6 px-6 py-3 bg-accent text-textDark font-semibold rounded-neumorphic shadow-md
-                   hover:shadow-none border-2 border-primary active:shadow-innerSoft transition-all duration-300
-                   "
-        onClick={() => navigate("/login")}
-      >
-        Get Started
-      </button>
     </div>
 
-        {/* Slider Section */}
-        <div className="mt-8 md:mt-0 max-w-2xl w-full rounded-neumorphic shadow-outerRaised p-2 overflow-hidden">
-          <Slider {...sliderSettings}>
-            <div>
-              <img
-                src="https://static.wixstatic.com/media/bfee2e_a361f3557fc440c98d1d2edf8c1f0d1f~mv2.jpg/v1/fill/w_1891,h_783,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/bfee2e_a361f3557fc440c98d1d2edf8c1f0d1f~mv2.jpg"
-                alt="College Campus"
-                className="rounded-lg w-full"
-              />
-            </div>
-            <div>
-              <img
-                src="https://www.vidyavision.com/CollegeUploads/Photos/2019-30-3-15-05-13_Screenshot%20(160).png"
-                alt="College Campus"
-                className="rounded-lg w-full h-64"
-              />
-            </div>
-          </Slider>
-        </div>
-      </div>
+    <h1 className="text-4xl md:text-5xl font-heading mb-4">
+      Staff Leave Management System
+    </h1>
 
+    <p className="mt-4 text-lg text-black">
+      Streamline leave tracking for faculty and staff effortlessly.
+    </p>
+
+    <button
+      className="mt-6 px-6 py-3 bg-accent text-textDark font-semibold rounded-neumorphic shadow-md
+                 hover:shadow-none border-2 border-primary active:shadow-innerSoft transition-all duration-300"
+      onClick={() => navigate("/login")}
+    >
+      Get Started
+    </button>
+  </div>
+</div>
       {/* About College Section */}
       <div className="flex py-16 px-6 bg-white rounded-neumorphic shadow-innerSoft flex-row justify-around" >
         <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-16 items-center">
